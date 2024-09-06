@@ -1,5 +1,13 @@
 # Run 
 
+Ensure you have opentofu (or terraform CLI installed).
+The sample scripts relly on `tofu` command, but its 100% compatible with `terraform` CLI.
+
+Ensure the tofu CLI is installed by calling:
+```sh
+brew install opentofu
+```
+
 Save a new version of the template file `examples/kyma-on-btp-basic/local-template.tfvars` as `examples/kyma-on-btp-basic/local.tfvars`. Provide values for input variables.
 
 Run the example:
