@@ -22,7 +22,7 @@ variable "BTP_BOT_PASSWORD" {
 variable "BTP_BACKEND_URL" {
   type        = string
   description = "BTP backend URL"
-  default     = "https://cpcli.cf.sap.hana.ondemand.com"
+  default     = "https://cli.btp.cloud.sap"
 }
 
 variable "BTP_SUBACCOUNT" {
@@ -34,13 +34,13 @@ variable "BTP_SUBACCOUNT" {
 variable "BTP_KYMA_PLAN" {
   type        = string
   description = "Plan name"
-  default     = "gcp"
+  default     = "azure"
 }
 
 variable "BTP_SA_REGION" {
   type        = string
   description = "Region name"
-  default     = "us31"
+  default     = "eu20"
 }
 
 variable "BTP_CUSTOM_IAS_TENANT" {
@@ -52,13 +52,13 @@ variable "BTP_CUSTOM_IAS_TENANT" {
 variable "BTP_CUSTOM_IAS_DOMAIN" {
   type        = string
   description = "Custom IAS domain"
-  default     = "accounts400.ondemand.com"
+  default     = "accounts.ondemand.com"
 }
 
 variable "BTP_KYMA_REGION" {
   type        = string
   description = "Kyma region"
-  default     = "us-central1"
+  default     = "westeurope"
 }
 
 variable "BTP_PROVIDER_SUBACCOUNT_ID" {
