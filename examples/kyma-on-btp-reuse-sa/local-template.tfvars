@@ -1,8 +1,6 @@
-# BTP_USE_SUBACCOUNT_ID = ""
-# BTP_NEW_SUBACCOUNT_NAME = ""
 
-# one of many available regions (without the `cf-` prefix!). I.e `eu20`
-BTP_SA_REGION = ""
+# Mandatory ID of the subaccount to be used
+BTP_USE_SUBACCOUNT_ID = ""
 
 BTP_BOT_USER = ""
 BTP_BOT_PASSWORD = ""
