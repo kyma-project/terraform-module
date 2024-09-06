@@ -2,6 +2,9 @@
 
 ## Ensure CLI tools
 
+#TODO : Explain the requirements that existing subaccount needs to fulfill to be reused.
+- the bot user should have "Administrator" role
+
 Ensure you have opentofu (or terraform CLI installed).
 The sample scripts relly on `tofu` command, but its 100% compatible with `terraform` CLI.
 
