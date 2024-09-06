@@ -1,0 +1,8 @@
+.terraform
+.terraform.lock.hcl
+examples/*/local.tfvars
+examples/*/terraform.tfstate
+examples/*/.terraform.tfstate.lock.info
+terraform.tfstate
+examples/*/kubeconfig.yaml
+examples/*/terraform.tfstate.backup
