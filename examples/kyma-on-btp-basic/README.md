@@ -1,4 +1,6 @@
-# Run 
+# Prerequisites
+
+## Ensure CLI tools
 
 Ensure you have opentofu (or terraform CLI installed).
 The sample scripts relly on `tofu` command, but its 100% compatible with `terraform` CLI.
@@ -8,7 +10,21 @@ Ensure the tofu CLI is installed by calling:
 brew install opentofu
 ```
 
-Save a new version of the template file `examples/kyma-on-btp-basic/local-template.tfvars` as `examples/kyma-on-btp-basic/local.tfvars`. Provide values for input variables.
+## Ensure bot user access
+
+In order to make automatic management of btp resources possible you need to ensure the following:
+ - establish trust between BTP global account and your custom IAS tenant
+ - add the bot user to the custom IAS tenant
+ - assign global account administrator role collection to the bot user (this example needs it to create subaccount. It is not required if subaccount is reused)
+ - if you decide to use provider subaccount in order to create disposable references to existing, shared instances of stateful services  (via `BTP_PROVIDER_SUBACCOUNT_ID` environment variable ) the bot user would need to have `Subaccount Viewer` role collection assigned in the provider subaccount.
+
+## Ensure Input Variables
+
+Save a new version of the template file `examples/kyma-on-btp-basic/local-template.tfvars` as `examples/kyma-on-btp-basic/local.tfvars`. Provide values for input variables
+
+
+# Run 
+
 
 Run the example:
 
