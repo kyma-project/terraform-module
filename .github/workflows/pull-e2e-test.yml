@@ -8,6 +8,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: compute github commit sha 
+        id: vars
+        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
       - name: Create kyma runtime on btp
         working-directory: examples/kyma-on-btp-basic
         run: |
@@ -15,7 +18,7 @@ jobs:
           terraform apply -auto-approve
           terraform destroy -auto-approve
         env:
-          TF_VAR_BTP_SUBACCOUNT: btp-test-PR-${{ github.event.number }}-${{ github.run_attempt }}
+          TF_VAR_BTP_SUBACCOUNT: tf-kyma-module-test-${{ steps.vars.outputs.sha_short }}-${{ github.run_attempt }}
           TF_VAR_BTP_SA_REGION: ${{ secrets.sa_region }}
           TF_VAR_BTP_GLOBAL_ACCOUNT: ${{ secrets.global_account }}
           TF_VAR_BTP_BOT_USER: ${{ secrets.username }}
