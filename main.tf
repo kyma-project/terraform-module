@@ -204,7 +204,7 @@ data "btp_subaccount" "reuse_subaccount" {
 resource "btp_subaccount" "subaccount" {
   count = var.BTP_NEW_SUBACCOUNT_NAME != null && var.BTP_USE_SUBACCOUNT_ID == null ? 1 : 0
   name      = var.BTP_NEW_SUBACCOUNT_NAME
-  region    = var.BTP_SA_REGION
+  region    = var.BTP_NEW_SUBACCOUNT_REGION
   subdomain = var.BTP_NEW_SUBACCOUNT_NAME
 }
 

@@ -63,9 +63,3 @@ variable "BTP_PROVIDER_SUBACCOUNT_ID" {
   default = null
 }
 
-#deprecated
-variable "BTP_SA_REGION" {
-  type        = string
-  description = "Region name"
-  default     = "us31"
-}

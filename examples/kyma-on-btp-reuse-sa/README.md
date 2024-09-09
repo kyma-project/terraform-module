@@ -23,7 +23,7 @@ In order to make automatic management of btp resources possible you need to ensu
 
 ## Ensure Input Variables
 
-Save a new version of the template file `examples/kyma-on-btp-basic/local-template.tfvars` as `examples/kyma-on-btp-basic/local.tfvars`. Provide values for input variables
+Save a new version of the template file `examples/kyma-on-btp-new-sa/local-template.tfvars` as `examples/kyma-on-btp-new-sa/local.tfvars`. Provide values for input variables
 
 
 # Run 
