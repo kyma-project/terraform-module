@@ -20,20 +20,7 @@ resource "btp_subaccount_environment_instance" "kyma" {
   plan_name        = btp_subaccount_entitlement.kyma.plan_name
   parameters = jsonencode({
     modules = {
-      list = [
-        {
-          name    = "api-gateway"
-          channel = "fast"
-        },
-        {
-          name    = "istio"
-          channel = "fast"
-        },
-        {
-          name    = "btp-operator"
-          channel = "fast"
-        }
-      ]
+      list = var.BTP_KYMA_MODULES
     }
     oidc = {
       groupsClaim    = "groups"
