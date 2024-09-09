@@ -1,0 +1,30 @@
+name: pull-e2e-test
+on:
+  pull_request:
+
+jobs:
+  btp-integration-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: opentofu/setup-opentofu@v1
+      - name: Create kyma runtime on btp
+        working-directory: examples/kyma-on-btp-basic
+        run: |
+          tofu init
+          tofu apply -auto-approve
+          tofu destroy -auto-approve
+        env:
+          TF_VAR_BTP_SUBACCOUNT: btp-test-PR-${{ github.event.number }}-${{ github.run_attempt }}
+          TF_VAR_BTP_SA_REGION: ${{ secrets.sa_region }}
+          TF_VAR_BTP_GLOBAL_ACCOUNT: ${{ secrets.global_account }}
+          TF_VAR_BTP_BOT_USER: ${{ secrets.username }}
+          TF_VAR_BTP_BOT_PASSWORD: ${{ secrets.password }}
+          TF_VAR_BTP_KYMA_PLAN: ${{ secrets.kyma_plan }}
+          TF_VAR_BTP_KYMA_REGION: ${{ secrets.kyma_region }}
+          TF_VAR_BTP_CUSTOM_IAS_TENANT: ${{ secrets.ias_tenant }}
+          TF_VAR_BTP_CUSTOM_IAS_DOMAIN: ${{ secrets.ias_domain }}
+          TF_VAR_BTP_BACKEND_URL: ${{ secrets.btp_api_url }}
+
+
+

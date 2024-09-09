@@ -17,6 +17,7 @@ variable "BTP_BOT_PASSWORD" {
   type        = string
   description = "Bot account password"
   default     = "password"
+  sensitive = true
 }
 
 variable "BTP_BACKEND_URL" {

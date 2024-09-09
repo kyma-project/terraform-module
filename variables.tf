@@ -61,6 +61,7 @@ variable "BTP_BOT_PASSWORD" {
   type        = string
   description = "Bot account password"
   default     = "password"
+  sensitive = true
 }
 
 variable "BTP_PROVIDER_SUBACCOUNT_ID" {
