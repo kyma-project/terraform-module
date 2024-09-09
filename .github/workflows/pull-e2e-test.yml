@@ -1,6 +1,7 @@
 name: pull-e2e-test
 on:
-  pull_request:
+  push:
+    branches: [ "main", "release-*" ]
 
 jobs:
   btp-integration-tests:
@@ -16,7 +17,7 @@ jobs:
         env:
           TF_VAR_BTP_SUBACCOUNT: btp-test-PR-${{ github.event.number }}-${{ github.run_attempt }}
           TF_VAR_BTP_SA_REGION: ${{ secrets.sa_region }}
-          TF_VAR_BTP_GLOBAL_ACCOUNT: ${{ secrets.GLOBAL_ACCOUNT }}
+          TF_VAR_BTP_GLOBAL_ACCOUNT: ${{ secrets.global_account }}
           TF_VAR_BTP_BOT_USER: ${{ secrets.username }}
           TF_VAR_BTP_BOT_PASSWORD: ${{ secrets.password }}
           TF_VAR_BTP_KYMA_PLAN: ${{ secrets.kyma_plan }}
