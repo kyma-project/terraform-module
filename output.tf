@@ -7,5 +7,5 @@ output "kubeconfig" {
 }
 
 output "subaccount_id" {
-  value = btp_subaccount.subaccount == null ? var.BTP_USE_SUBACCOUNT_ID : btp_subaccount.subaccount.id
+  value = local.subaccount_id
 }

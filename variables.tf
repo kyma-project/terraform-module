@@ -8,11 +8,11 @@ variable "BTP_KYMA_PLAN" {
 }
 
 #Deprecated
-variable "BTP_SUBACCOUNT" {
-  type        = string
-  description = "Subaccount name"
-  default     = null
-}
+# variable "BTP_SUBACCOUNT" {
+#   type        = string
+#   description = "Subaccount name"
+#   default     = null
+# }
 
 variable "BTP_USE_SUBACCOUNT_ID" {
   type        = string

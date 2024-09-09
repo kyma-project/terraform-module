@@ -1,15 +1,20 @@
 # "kyma.tf"
 
+locals {
+  subaccount_name = var.BTP_USE_SUBACCOUNT_ID != null && var.BTP_NEW_SUBACCOUNT_NAME ==null ? one(data.btp_subaccount.reuse_subaccount).name : one(btp_subaccount.subaccount).name
+  subaccount_id   = var.BTP_USE_SUBACCOUNT_ID != null && var.BTP_NEW_SUBACCOUNT_NAME ==null ? one(data.btp_subaccount.reuse_subaccount).id : one(btp_subaccount.subaccount).id
+}
+
 resource "btp_subaccount_entitlement" "kyma" {
-  subaccount_id = btp_subaccount.subaccount.id
+  subaccount_id = local.subaccount_id
   service_name  = "kymaruntime"
   plan_name     = var.BTP_KYMA_PLAN
   amount        = 1
 }
 
 resource "btp_subaccount_environment_instance" "kyma" {
-  subaccount_id    = btp_subaccount.subaccount.id
-  name             = "${var.BTP_SUBACCOUNT}-kyma"
+  subaccount_id    = local.subaccount_id
+  name             = "${local.subaccount_name}-kyma"
   environment_type = "kyma"
   service_name     = btp_subaccount_entitlement.kyma.service_name
   plan_name        = btp_subaccount_entitlement.kyma.plan_name
@@ -38,7 +43,7 @@ resource "btp_subaccount_environment_instance" "kyma" {
       clientID       = jsondecode(btp_subaccount_service_binding.identity_application_binding.credentials).clientid
       issuerURL      = "https://${var.BTP_CUSTOM_IAS_TENANT}.${var.BTP_CUSTOM_IAS_DOMAIN}"
     }
-    name   = "${var.BTP_SUBACCOUNT}-kyma"
+    name   = "${local.subaccount_name}-kyma"
     region = var.BTP_KYMA_REGION
     administrators = [
       var.BTP_BOT_USER
@@ -84,30 +89,30 @@ resource "local_sensitive_file" "kubeconfig-yaml" {
 #"oidc.tf"
 
 resource "btp_subaccount_entitlement" "identity" {
-  subaccount_id = btp_subaccount.subaccount.id
+  subaccount_id = local.subaccount_id
   service_name  = "identity"
   plan_name     = "application"
 }
 
 # custom idp
 resource "btp_subaccount_trust_configuration" "custom_idp" {
-  subaccount_id     = btp_subaccount.subaccount.id
+  subaccount_id     = local.subaccount_id
   identity_provider = "${var.BTP_CUSTOM_IAS_TENANT}.${var.BTP_CUSTOM_IAS_DOMAIN}"
-  name              = "${var.BTP_SUBACCOUNT}-${var.BTP_CUSTOM_IAS_TENANT}"
+  name              = "${local.subaccount_name}-${var.BTP_CUSTOM_IAS_TENANT}"
   depends_on        = [btp_subaccount_entitlement.identity]
 }
 
 data "btp_subaccount_service_plan" "identity_application" {
   depends_on    = [btp_subaccount_entitlement.identity]
-  subaccount_id = btp_subaccount.subaccount.id
+  subaccount_id = local.subaccount_id
   offering_name = "identity"
   name          = "application"
 }
 
 resource "btp_subaccount_service_instance" "identity_application" {
   depends_on     = [btp_subaccount_trust_configuration.custom_idp]
-  subaccount_id  = btp_subaccount.subaccount.id
-  name           = "${var.BTP_SUBACCOUNT}-${var.BTP_CUSTOM_IAS_TENANT}-oidc-app"
+  subaccount_id  = local.subaccount_id
+  name           = "${local.subaccount_name}-${var.BTP_CUSTOM_IAS_TENANT}-oidc-app"
   serviceplan_id = data.btp_subaccount_service_plan.identity_application.id
   parameters = jsonencode({
     user-access = "public"
@@ -149,14 +154,14 @@ resource "btp_subaccount_service_instance" "identity_application" {
       user_uuid  = "userUuid",
       locale     = "language"
     },
-    name         = "${var.BTP_SUBACCOUNT}-${var.BTP_CUSTOM_IAS_TENANT}-oidc-app",
-    display-name = "${var.BTP_SUBACCOUNT}-${var.BTP_CUSTOM_IAS_TENANT}-oidc-app"
+    name         = "${local.subaccount_name}-${var.BTP_CUSTOM_IAS_TENANT}-oidc-app",
+    display-name = "${local.subaccount_name}-${var.BTP_CUSTOM_IAS_TENANT}-oidc-app"
   })
 }
 
 resource "btp_subaccount_service_binding" "identity_application_binding" {
-  subaccount_id       = btp_subaccount.subaccount.id
-  name                = "${var.BTP_SUBACCOUNT}-${var.BTP_CUSTOM_IAS_TENANT}-oidc-app-binding"
+  subaccount_id       = local.subaccount_id
+  name                =  "${local.subaccount_name}-${var.BTP_CUSTOM_IAS_TENANT}-oidc-app-binding"
   service_instance_id = btp_subaccount_service_instance.identity_application.id
   parameters = jsonencode({
     credential-type = "X509_GENERATED"
@@ -191,9 +196,15 @@ data "btp_subaccount_service_binding" "provider_sm" {
 
 #"subaccount.tf"
 
+data "btp_subaccount" "reuse_subaccount" {
+  count = var.BTP_USE_SUBACCOUNT_ID != null && var.BTP_NEW_SUBACCOUNT_NAME == null ? 1 : 0
+  id = var.BTP_USE_SUBACCOUNT_ID
+}
+
 resource "btp_subaccount" "subaccount" {
-  name      = var.BTP_SUBACCOUNT
+  count = var.BTP_NEW_SUBACCOUNT_NAME != null && var.BTP_USE_SUBACCOUNT_ID == null ? 1 : 0
+  name      = var.BTP_NEW_SUBACCOUNT_NAME
   region    = var.BTP_SA_REGION
-  subdomain = var.BTP_SUBACCOUNT
+  subdomain = var.BTP_NEW_SUBACCOUNT_NAME
 }
 
