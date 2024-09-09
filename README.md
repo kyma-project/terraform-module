@@ -1,5 +1,9 @@
 # terraform-sap-kyma-on-btp
 
+## Status
+
+[![REUSE status](https://api.reuse.software/badge/github.com/kyma-project/terraform-module)](https://api.reuse.software/info/github.com/kyma-project/terraform-module)
+
 ## Overview
 
 Terraform module that creates kyma runtime in SAP BTP platform.
