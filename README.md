@@ -1,10 +1,11 @@
-> **TIP:** Apart from the {Module Name} heading, you can use your own titles for the remaining sections. You can also add more module-specific sections.
-
 # terraform-sap-kyma-on-btp
 
 ## Overview
-> Provide a description of your module and its components. Describe its features and functionalities.
-> You can divide this section to the relevant subsections.
+
+Terraform module that creates kyma runtime in SAP BTP platform.
+
+![image](./assets/sequence.png)
+
 ### Input Variables
 
 ### Outputs
