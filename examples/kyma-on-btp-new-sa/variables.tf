@@ -1,47 +1,10 @@
 # we're using uppercase variable names, since in some cases (e.g Azure DevOps) the system variables are forced to be uppercase
 # TF allows providing variable values as env variables of name name, case sensitive
 
-variable "BTP_KYMA_PLAN" {
+variable "BTP_GLOBAL_ACCOUNT" {
   type        = string
-  description = "Plan name"
-  default     = "gcp"
-}
-
-variable "BTP_USE_SUBACCOUNT_ID" {
-  type        = string
-  description = "Subaccount name"
-  default     = null
-}
-
-
-variable "BTP_NEW_SUBACCOUNT_NAME" {
-  type        = string
-  description = "Subaccount name"
-  default     = null
-}
-
-variable "BTP_NEW_SUBACCOUNT_REGION" {
-  type        = string
-  description = "Region name"
-  default     = null
-}
-
-variable "BTP_CUSTOM_IAS_TENANT" {
-  type        = string
-  description = "Custom IAS tenant"
-  default     = "custon-tenant"
-}
-
-variable "BTP_CUSTOM_IAS_DOMAIN" {
-  type        = string
-  description = "Custom IAS domain"
-  default     = "accounts400.ondemand.com"
-}
-
-variable "BTP_KYMA_REGION" {
-  type        = string
-  description = "Kyma region"
-  default     = "us-central1"
+  description = "Global account name"
+  default     = "global-account-guid"
 }
 
 variable "BTP_BOT_USER" {
@@ -57,9 +20,50 @@ variable "BTP_BOT_PASSWORD" {
   sensitive = true
 }
 
+variable "BTP_BACKEND_URL" {
+  type        = string
+  description = "BTP backend URL"
+  default     = "https://cli.btp.cloud.sap"
+}
+
+variable "BTP_NEW_SUBACCOUNT_NAME" {
+  type        = string
+  description = "Subaccount name"
+  default     = null
+}
+
+variable "BTP_NEW_SUBACCOUNT_REGION" {
+  type        = string
+  description = "Region name"
+  default     = null
+}
+
+variable "BTP_KYMA_PLAN" {
+  type        = string
+  description = "Plan name"
+  default     = "azure"
+}
+
+variable "BTP_CUSTOM_IAS_TENANT" {
+  type        = string
+  description = "Custom IAS tenant"
+  default     = "custon-tenant"
+}
+
+variable "BTP_CUSTOM_IAS_DOMAIN" {
+  type        = string
+  description = "Custom IAS domain"
+  default     = "accounts.ondemand.com"
+}
+
+variable "BTP_KYMA_REGION" {
+  type        = string
+  description = "Kyma region"
+  default     = "westeurope"
+}
+
 variable "BTP_PROVIDER_SUBACCOUNT_ID" {
   type        = string
   description = "Subaccount ID"
   default = null
 }
-

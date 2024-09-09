@@ -17,7 +17,6 @@ variable "BTP_BOT_PASSWORD" {
   type        = string
   description = "Bot account password"
   default     = "password"
-  sensitive = true
 }
 
 variable "BTP_BACKEND_URL" {
@@ -26,22 +25,16 @@ variable "BTP_BACKEND_URL" {
   default     = "https://cli.btp.cloud.sap"
 }
 
-variable "BTP_SUBACCOUNT" {
+variable "BTP_USE_SUBACCOUNT_ID" {
   type        = string
   description = "Subaccount name"
-  default     = "subaccount-name"
+  default     = null
 }
 
 variable "BTP_KYMA_PLAN" {
   type        = string
   description = "Plan name"
   default     = "azure"
-}
-
-variable "BTP_SA_REGION" {
-  type        = string
-  description = "Region name"
-  default     = "eu20"
 }
 
 variable "BTP_CUSTOM_IAS_TENANT" {
