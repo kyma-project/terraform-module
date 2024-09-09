@@ -1,19 +1,19 @@
 name: pull-e2e-test
 on:
-  pull_request:
+  push:
+    branches: [ "main", "release-*" ]
 
 jobs:
   btp-integration-tests:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: opentofu/setup-opentofu@v1
       - name: Create kyma runtime on btp
         working-directory: examples/kyma-on-btp-basic
         run: |
-          tofu init
-          tofu apply -auto-approve
-          tofu destroy -auto-approve
+          terraform init
+          terraform apply -auto-approve
+          terraform destroy -auto-approve
         env:
           TF_VAR_BTP_SUBACCOUNT: btp-test-PR-${{ github.event.number }}-${{ github.run_attempt }}
           TF_VAR_BTP_SA_REGION: ${{ secrets.sa_region }}
