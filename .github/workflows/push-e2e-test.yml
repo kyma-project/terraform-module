@@ -2,6 +2,8 @@ name: pull-e2e-test
 on:
   push:
     branches: [ "main", "release-*" ]
+  pull_request_target:
+    types: [opened, edited, synchronize, reopened]
 
 jobs:
   btp-integration-tests:
