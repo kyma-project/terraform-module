@@ -1,16 +1,14 @@
 name: pull-e2e-test
 on:
   push:
-    branches: [ "main", "release-*" ]
-  pull_request_target:
-    types: [opened, edited, synchronize, reopened]
+    branches: ["main", "release-*"]
 
 jobs:
   btp-integration-tests:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: compute github commit sha 
+      - name: compute github commit sha
         id: vars
         run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
       - name: Create kyma runtime on btp
@@ -30,6 +28,3 @@ jobs:
           TF_VAR_BTP_CUSTOM_IAS_TENANT: ${{ secrets.ias_tenant }}
           TF_VAR_BTP_CUSTOM_IAS_DOMAIN: ${{ secrets.ias_domain }}
           TF_VAR_BTP_BACKEND_URL: ${{ secrets.btp_api_url }}
-
-
-
