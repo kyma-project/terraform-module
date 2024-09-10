@@ -3,7 +3,10 @@
 version: 2
 updates:
   - package-ecosystem: "terraform"
-    directory: "/"
+    directories:
+      - "/"
+      - "/examples/kyma-on-btp-new-sa"
+      - "/examples/kyma-on-btp-reuse-sa"
     schedule:
       interval: "weekly"
     commit-message:
