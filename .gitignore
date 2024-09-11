@@ -6,4 +6,3 @@ examples/*/.terraform.tfstate.lock.info
 terraform.tfstate
 examples/*/kubeconfig.yaml
 examples/*/terraform.tfstate.backup
-examples/kyma-on-btp-new-sa/subaccount_id.txt
