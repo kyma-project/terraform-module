@@ -4,7 +4,7 @@
 variable "BTP_KYMA_PLAN" {
   type        = string
   description = "Plan name"
-  default     = "gcp"
+  default     = "azure"
 }
 
 variable "BTP_USE_SUBACCOUNT_ID" {
@@ -23,7 +23,7 @@ variable "BTP_NEW_SUBACCOUNT_NAME" {
 variable "BTP_NEW_SUBACCOUNT_REGION" {
   type        = string
   description = "Region name"
-  default     = null
+  default     = "eu20"
 }
 
 variable "BTP_CUSTOM_IAS_TENANT" {
@@ -35,13 +35,13 @@ variable "BTP_CUSTOM_IAS_TENANT" {
 variable "BTP_CUSTOM_IAS_DOMAIN" {
   type        = string
   description = "Custom IAS domain"
-  default     = "accounts400.ondemand.com"
+  default     = "accounts.ondemand.com"
 }
 
 variable "BTP_KYMA_REGION" {
   type        = string
   description = "Kyma region"
-  default     = "us-central1"
+  default     = "westeurope"
 }
 
 variable "BTP_BOT_USER" {
@@ -61,6 +61,12 @@ variable "BTP_PROVIDER_SUBACCOUNT_ID" {
   type        = string
   description = "Subaccount ID"
   default = null
+}
+
+variable "BTP_BACKEND_URL" {
+  type        = string
+  description = "Backend URL for BTP API; defaults to https://cli.btp.cloud.sap"
+  default = "https://cli.btp.cloud.sap"
 }
 
 variable "BTP_KYMA_MODULES" {

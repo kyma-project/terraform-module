@@ -39,3 +39,7 @@ module "kyma" {
   BTP_NEW_SUBACCOUNT_REGION = var.BTP_NEW_SUBACCOUNT_REGION
   BTP_KYMA_MODULES = var.BTP_KYMA_MODULES
 }
+
+output "subaccount_id" {
+  value = module.kyma.subaccount_id
+}
