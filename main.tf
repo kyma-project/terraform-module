@@ -86,7 +86,6 @@ resource "btp_subaccount_trust_configuration" "custom_idp" {
   subaccount_id     = local.subaccount_id
   identity_provider = "${var.BTP_CUSTOM_IAS_TENANT}.${var.BTP_CUSTOM_IAS_DOMAIN}"
   name              = "${local.subaccount_name}-${var.BTP_CUSTOM_IAS_TENANT}"
-  depends_on        = [btp_subaccount_entitlement.identity]
 }
 
 data "btp_subaccount_service_plan" "identity_application" {
@@ -176,7 +175,6 @@ data "http" "token" {
 
 data "btp_subaccount_service_binding" "provider_sm" {
   count = var.BTP_PROVIDER_SUBACCOUNT_ID == null ? 0 : 1
-  # count = try(var.BTP_PROVIDER_SUBACCOUNT_ID, false) ? 1 : 0
   subaccount_id = var.BTP_PROVIDER_SUBACCOUNT_ID
   name          = "provider-sm-binding"
 }
