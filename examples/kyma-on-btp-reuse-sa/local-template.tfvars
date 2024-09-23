@@ -1,7 +1,7 @@
 
-# Mandatory ID of the subaccount to be used
-BTP_USE_SUBACCOUNT_ID = ""
+# Copy this file as `local.tfvars` and provide values 
 
+BTP_USE_SUBACCOUNT_ID = ""
 BTP_BOT_USER = ""
 BTP_BOT_PASSWORD = ""
 BTP_GLOBAL_ACCOUNT = ""
