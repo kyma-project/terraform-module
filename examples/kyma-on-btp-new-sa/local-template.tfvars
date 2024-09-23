@@ -1,4 +1,4 @@
-# BTP_USE_SUBACCOUNT_ID = ""
+# Copy this file as `local.tfvars` and provide values 
 
 BTP_NEW_SUBACCOUNT_NAME = ""
 

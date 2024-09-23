@@ -1,10 +1,6 @@
-# Prerequisites
+## Prerequisites
 
-## Ensure CLI tools
-
-#TODO : Explain the requirements that existing subaccount needs to fulfill to be reused.
-- the bot user should have "Administrator" role
-
+### Ensure CLI tools
 Ensure you have opentofu (or terraform CLI installed).
 The sample scripts relly on `tofu` command, but its 100% compatible with `terraform` CLI.
 
@@ -13,22 +9,28 @@ Ensure the tofu CLI is installed by calling:
 brew install opentofu
 ```
 
-## Ensure bot user access
+### Ensure Input parameters 
 
-In order to make automatic management of btp resources possible you need to ensure the following:
- - establish trust between BTP global account and your custom IAS tenant
- - add the bot user to the custom IAS tenant
- - assign global account administrator role collection to the bot user (this example needs it to create subaccount. It is not required if subaccount is reused)
- - if you decide to use provider subaccount in order to create disposable references to existing, shared instances of stateful services  (via `BTP_PROVIDER_SUBACCOUNT_ID` environment variable ) the bot user would need to have `Subaccount Viewer` role collection assigned in the provider subaccount.
+Save a new version of the template file `examples/kyma-on-btp-reuse-sa/local-template.tfvars` as `examples/kyma-on-btp-reuse-sa/local.tfvars`. Provide values for input variables.
 
-## Ensure Input Variables
+```
+BTP_USE_SUBACCOUNT_ID = "...."
+BTP_BOT_USER = "{my-technical-user}@sap.com"
+BTP_BOT_PASSWORD = "..."
+BTP_GLOBAL_ACCOUNT = "..."
+BTP_CUSTOM_IAS_TENANT = "..."
+```
 
-Save a new version of the template file `examples/kyma-on-btp-new-sa/local-template.tfvars` as `examples/kyma-on-btp-new-sa/local.tfvars`. Provide values for input variables
+### Ensure technical user access
 
+In this example a new subaccount is not created automaticallu but an existing subaccount is reused instead. Please ensure the following:
+ - make sure the subaccount to reuse belongs to the global account,
+ - make sure that your custom SAP IAS tenant is trusted on subbaccount level,
+ - make sure that technical user (bot user) is added to the subaccount and is assigned a subaccount administrator role collection,
+  - make sure the technical user is added to your custom SAP IAS tenant. 
+  - if you decide to use provider subaccount in order to create disposable references to existing, shared instances of stateful services  (via `BTP_PROVIDER_SUBACCOUNT_ID` environment variable ) the bot user would need to have `Subaccount Viewer` role collection assigned in the provider subaccount.
 
-# Run 
-
-
+## Run 
 Run the example:
 
 ```sh

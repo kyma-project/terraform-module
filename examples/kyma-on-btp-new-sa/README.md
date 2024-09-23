@@ -1,5 +1,6 @@
-# Run 
+## Prerequisites
 
+### Ensure CLI tools
 Ensure you have opentofu (or terraform CLI installed).
 The sample scripts relly on `tofu` command, but its 100% compatible with `terraform` CLI.
 
@@ -8,8 +9,28 @@ Ensure the tofu CLI is installed by calling:
 brew install opentofu
 ```
 
+### Ensure Input parameters 
+
 Save a new version of the template file `examples/kyma-on-btp-new-sa/local-template.tfvars` as `examples/kyma-on-btp-new-sa/local.tfvars`. Provide values for input variables.
 
+```
+BTP_NEW_SUBACCOUNT_NAME = "new-test-sa"
+BTP_NEW_SUBACCOUNT_REGION = "..."
+BTP_BOT_USER = "{my-technical-user}@sap.com"
+BTP_BOT_PASSWORD = "..."
+BTP_GLOBAL_ACCOUNT = "..."
+BTP_CUSTOM_IAS_TENANT = "..."
+```
+
+### Ensure technical user access
+
+In this example a new subaccount is created automatically. Please ensure the following
+ - make sure that your custom SAP IAS tenant is trusted on global account level,
+ - make sure that technical user (bot user) is added to the global account and is assigned a global account administrator role collection,
+  - make sure the technical user is added to your custom SAP IAS tenant. 
+  - if you decide to use provider subaccount in order to create disposable references to existing, shared instances of stateful services  (via `BTP_PROVIDER_SUBACCOUNT_ID` environment variable ) the bot user would need to have `Subaccount Viewer` role collection assigned in the provider subaccount.
+
+## Run 
 Run the example:
 
 ```sh
@@ -26,5 +47,5 @@ kubectl get nodes --kubeconfig kubeconfig.yaml
 Last but not least, deprovision all resources via:
 
 ```sh
-tofu destroy -var="BTP_NEW_SUBACCOUNT_NAME=foo" -var-file="local.tfvars" -auto-approve
+tofu destroy -var-file="local.tfvars" -auto-approve
 ```
