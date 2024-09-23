@@ -27,8 +27,8 @@ BTP_CUSTOM_IAS_TENANT = "..."
 In this example a new subaccount is created automatically. Please ensure the following
  - make sure that your custom SAP IAS tenant is trusted on global account level,
  - make sure that technical user (bot user) is added to the global account and is assigned a global account administrator role collection,
-  - make sure the technical user is added to your custom SAP IAS tenant. 
-  - if you decide to use provider subaccount in order to create disposable references to existing, shared instances of stateful services  (via `BTP_PROVIDER_SUBACCOUNT_ID` environment variable ) the bot user would need to have `Subaccount Viewer` role collection assigned in the provider subaccount.
+ - make sure the technical user is added to your custom SAP IAS tenant. 
+ - if you decide to use provider subaccount in order to create disposable references to existing, shared instances of stateful services  (via `BTP_PROVIDER_SUBACCOUNT_ID` environment variable ) the bot user would need to have `Subaccount Viewer` role collection assigned in the provider subaccount.
 
 ## Run 
 Run the example:
