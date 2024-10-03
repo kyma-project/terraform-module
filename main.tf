@@ -82,6 +82,46 @@ resource "local_sensitive_file" "kubeconfig-yaml" {
   content  = yamlencode(jsondecode(data.jq_query.kubeconfig.result) )
 }
 
+# wait for kyma readiness 
+resource "terraform_data" "wait-for-kyma-readiness" {
+  depends_on = [
+    resource.local_sensitive_file.kubeconfig-yaml
+  ]
+  provisioner "local-exec" {
+    interpreter = ["/bin/bash", "-c"]
+     command = <<EOF
+       (
+      KUBECONFIG=kubeconfig.yaml
+      set -e -o pipefail ;\
+      curl -LO https://dl.k8s.io/release/v1.31.0/bin/linux/amd64/kubectl
+      chmod +x kubectl
+      while ! kubectl get crd kymas.operator.kyma-project.io --kubeconfig $KUBECONFIG; do echo "Waiting for Kyma CRD..."; sleep 1; done
+      kubectl wait --for condition=established crd/kymas.operator.kyma-project.io --kubeconfig $KUBECONFIG
+      while ! kubectl get kyma default -n kyma-system --kubeconfig $KUBECONFIG; do echo "Waiting for default kyma CR..."; sleep 1; done
+      kubectl wait --for='jsonpath={.status.state}=Ready' kymas.operator.kyma-project.io/default -n kyma-system --kubeconfig $KUBECONFIG --timeout=480s
+      while ! kubectl get secret sap-btp-operator-clusterid -n kyma-system --kubeconfig $KUBECONFIG; do echo "Waiting for sap-btp-operator-clusterid..."; sleep 1; done
+      kubectl get secret sap-btp-operator-clusterid -n kyma-system -ojsonpath={.data.INITIAL_CLUSTER_ID} --kubeconfig $KUBECONFIG | base64 -D  > cluster_id.txt
+      while ! kubectl get cm shoot-info -n kube-system --kubeconfig $KUBECONFIG; do echo "Waiting for shoot-info cm..."; sleep 1; done
+      kubectl get cm shoot-info -n kube-system -ojsonpath={.data.domain} --kubeconfig $KUBECONFIG  > domain.txt
+       )
+     EOF
+  } 
+}
+
+data "local_file" "cluster_id" {
+  depends_on = [
+    resource.terraform_data.wait-for-kyma-readiness
+  ]
+  filename = "cluster_id.txt"
+}
+
+data "local_file" "domain" {
+  depends_on = [
+    resource.terraform_data.wait-for-kyma-readiness
+  ]
+  filename = "domain.txt"
+}
+
 #"oidc.tf"
 
 resource "btp_subaccount_entitlement" "identity" {

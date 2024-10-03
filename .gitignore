@@ -7,3 +7,6 @@ terraform.tfstate
 examples/*/kubeconfig.yaml
 examples/*/terraform.tfstate.backup
 examples/*/*.tfvars
+examples/*/cluster_id.txt
+examples/*/domain.txt
+examples/*/kubectl

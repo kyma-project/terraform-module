@@ -47,10 +47,10 @@ output "service_instance_id" {
   value = module.kyma.service_instance_id
 }
 
-output "service_id" {
-  value = module.kyma.service_id
+output "cluster_id" {
+  value = module.kyma.cluster_id
 }
 
-output "platform_id" {
-  value = module.kyma.platform_id
+output "domain" {
+  value = module.kyma.domain
 }

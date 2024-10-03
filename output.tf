@@ -10,10 +10,10 @@ output "service_instance_id" {
   value = btp_subaccount_environment_instance.kyma.id
 }
 
-output "service_id" {
-  value = data.btp_subaccount_environment_instance.kyma-instance.service_id
+output "cluster_id" {
+  value = data.local_file.cluster_id.content
 }
 
-output "platform_id" {
-  value = data.btp_subaccount_environment_instance.kyma-instance.platform_id
+output "domain" {
+  value = data.local_file.domain.content
 }
