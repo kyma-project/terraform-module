@@ -6,3 +6,4 @@ examples/*/.terraform.tfstate.lock.info
 terraform.tfstate
 examples/*/kubeconfig.yaml
 examples/*/terraform.tfstate.backup
+examples/*/*.tfvars

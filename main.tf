@@ -43,6 +43,15 @@ resource "btp_subaccount_environment_instance" "kyma" {
   }
 }
 
+data "btp_subaccount_environment_instance" "kyma-instance" {
+  depends_on = [
+    btp_subaccount_environment_instance.kyma
+  ]
+  subaccount_id    = local.subaccount_id
+  id = btp_subaccount_environment_instance.kyma.id
+}
+
+
 data "http" "kubeconfig" {
   url = jsondecode(btp_subaccount_environment_instance.kyma.labels).KubeconfigURL
   retry {
@@ -171,16 +180,7 @@ data "http" "token" {
   request_body = "grant_type=password&username=${var.BTP_BOT_USER}&password=${var.BTP_BOT_PASSWORD}&client_id=${local.idp.clientid}&scope=groups,email"
 }
 
-#"provider-sm.tf"
-
-data "btp_subaccount_service_binding" "provider_sm" {
-  count = var.BTP_PROVIDER_SUBACCOUNT_ID == null ? 0 : 1
-  subaccount_id = var.BTP_PROVIDER_SUBACCOUNT_ID
-  name          = "provider-sm-binding"
-}
-
 #"subaccount.tf"
-
 data "btp_subaccount" "reuse_subaccount" {
   count = var.BTP_USE_SUBACCOUNT_ID != null && var.BTP_NEW_SUBACCOUNT_NAME == null ? 1 : 0
   id = var.BTP_USE_SUBACCOUNT_ID
