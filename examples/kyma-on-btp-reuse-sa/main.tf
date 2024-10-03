@@ -44,3 +44,7 @@ output "service_instance_id" {
 output "cluster_id" {
   value = module.kyma.cluster_id
 }
+
+output "domain" {
+  value = module.kyma.domain
+}

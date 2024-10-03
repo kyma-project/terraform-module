@@ -13,3 +13,7 @@ output "service_instance_id" {
 output "cluster_id" {
   value = data.local_file.cluster_id.content
 }
+
+output "domain" {
+  value = data.local_file.domain.content
+}
