@@ -96,7 +96,7 @@ resource "terraform_data" "wait-for-kyma-readiness" {
       curl -LO https://dl.k8s.io/release/v1.31.0/bin/linux/amd64/kubectl
       chmod +x kubectl
       while ! kubectl get crd kymas.operator.kyma-project.io --kubeconfig $KUBECONFIG; do echo "Waiting for Kyma CRD..."; sleep 1; done
-	    kubectl wait --for condition=established crd/kymas.operator.kyma-project.io --kubeconfig $KUBECONFIG
+      kubectl wait --for condition=established crd/kymas.operator.kyma-project.io --kubeconfig $KUBECONFIG
       while ! kubectl get kyma default -n kyma-system --kubeconfig $KUBECONFIG; do echo "Waiting for default kyma CR..."; sleep 1; done
       kubectl wait --for='jsonpath={.status.state}=Ready' kymas.operator.kyma-project.io/default -n kyma-system --kubeconfig $KUBECONFIG --timeout=480s
       while ! kubectl get secret sap-btp-operator-clusterid -n kyma-system --kubeconfig $KUBECONFIG; do echo "Waiting for sap-btp-operator-clusterid..."; sleep 1; done
