@@ -36,3 +36,11 @@ module "kyma" {
   BTP_BOT_PASSWORD = var.BTP_BOT_PASSWORD
   BTP_USE_SUBACCOUNT_ID = var.BTP_USE_SUBACCOUNT_ID
 }
+
+output "service_instance_id" {
+  value = module.kyma.service_instance_id
+}
+
+output "cluster_id" {
+  value = module.kyma.cluster_id
+}
