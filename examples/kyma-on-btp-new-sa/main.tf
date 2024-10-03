@@ -35,11 +35,22 @@ module "kyma" {
   BTP_KYMA_REGION = var.BTP_KYMA_REGION
   BTP_BOT_USER = var.BTP_BOT_USER
   BTP_BOT_PASSWORD = var.BTP_BOT_PASSWORD
-  BTP_PROVIDER_SUBACCOUNT_ID = var.BTP_PROVIDER_SUBACCOUNT_ID
   BTP_NEW_SUBACCOUNT_REGION = var.BTP_NEW_SUBACCOUNT_REGION
   BTP_KYMA_MODULES = var.BTP_KYMA_MODULES
 }
 
 output "subaccount_id" {
   value = module.kyma.subaccount_id
+}
+
+output "service_instance_id" {
+  value = module.kyma.service_instance_id
+}
+
+output "service_id" {
+  value = module.kyma.service_id
+}
+
+output "platform_id" {
+  value = module.kyma.platform_id
 }

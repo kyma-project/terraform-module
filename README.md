@@ -25,13 +25,11 @@ Terraform module that creates kyma runtime in SAP BTP platform.
 | BTP_BACKEND_URL            | false     | https://cli.btp.cloud.sap | URL of the BTP backend API (on canary environment this has to be set to  `https://cpcli.cf.sap.hana.ondemand.com`).                                |
 | BTP_KYMA_PLAN              | false     | azure                     | Use one of a valid kyma plans that you are entitled to use (One of: `azure`, `gcp`, `aws`,`sap-converged-cloud`)                                   |
 | BTP_KYMA_REGION            | false     | westeurope                | Use a valid kyma region that matches your selected kyma plan                                                                                       |
-| BTP_PROVIDER_SUBACCOUNT_ID | false     |                           | Use a UUID of a SAP BTP Subaccount where you already have a sharable service instances which you would like to reference in the new kyma runtime   |
 
 ### Outputs 
 
 | Name                               | Condition for output presence                                     | Description                                                                                                                                                             |
 |------------------------------------|-------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| custom_service_manager_credentials | Present only if `BTP _PROVIDER_SUBACCOUNT_ID` was given as input  | Contains json-decoded parts of the provider subaccount's service manager secret data. Allows to reference a shared service instances from another (provider) subaccount |
 | kubeconfig                         | Always                                                            | yaml-encoded parts of the output kubeconfig. It can be used to initialise terraform kubernetes provider in the root module                                              |
 | subaccount_id                      | Always                                                            | subaccount ID of the created subaccount. It can be used to forcefully cleanup the subaccount i.e via BTP CLI                                                            |
 

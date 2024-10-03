@@ -57,12 +57,6 @@ variable "BTP_BOT_PASSWORD" {
   sensitive = true
 }
 
-variable "BTP_PROVIDER_SUBACCOUNT_ID" {
-  type        = string
-  description = "Subaccount ID"
-  default = null
-}
-
 variable "BTP_BACKEND_URL" {
   type        = string
   description = "Backend URL for BTP API; defaults to https://cli.btp.cloud.sap"

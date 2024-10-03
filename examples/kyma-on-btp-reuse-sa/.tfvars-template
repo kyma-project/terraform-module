@@ -1,10 +1,7 @@
+
 # Copy this file as `local.tfvars` and provide values 
 
-BTP_NEW_SUBACCOUNT_NAME = ""
-
-# one of many available regions (without the `cf-` prefix!). I.e `eu20`
-BTP_NEW_SUBACCOUNT_REGION = ""
-
+BTP_USE_SUBACCOUNT_ID = ""
 BTP_BOT_USER = ""
 BTP_BOT_PASSWORD = ""
 BTP_GLOBAL_ACCOUNT = ""
@@ -21,5 +18,3 @@ BTP_CUSTOM_IAS_DOMAIN = ""
 BTP_KYMA_PLAN = ""
 # Must match options for given plan; i.e `westeurope` is a valid kyma region for kyma plan `azure`
 BTP_KYMA_REGION = ""
-#optional
-BTP_PROVIDER_SUBACCOUNT_ID = ""
