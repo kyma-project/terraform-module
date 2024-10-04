@@ -26,12 +26,22 @@ Terraform module that creates kyma runtime in SAP BTP platform.
 | BTP_KYMA_PLAN              | false     | azure                     | Use one of a valid kyma plans that you are entitled to use (One of: `azure`, `gcp`, `aws`,`sap-converged-cloud`)                                   |
 | BTP_KYMA_REGION            | false     | westeurope                | Use a valid kyma region that matches your selected kyma plan                                                                                       |
 
+### Required Providers
+
+Terraform module for Kyma uses the following terraform [providers](provider.tf), which must be ensured by the root module:
+ - `SAP/btp`
+ - `massdriver-cloud/jq`
+ - `hashicorp/http`
+
 ### Outputs 
 
-| Name                               | Condition for output presence                                     | Description                                                                                                                                                             |
-|------------------------------------|-------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| kubeconfig                         | Always                                                            | yaml-encoded parts of the output kubeconfig. It can be used to initialise terraform kubernetes provider in the root module                                              |
-| subaccount_id                      | Always                                                            | subaccount ID of the created subaccount. It can be used to forcefully cleanup the subaccount i.e via BTP CLI                                                            |
+| Name                | Description                                                                                                                |
+|---------------------|----------------------------------------------------------------------------------------------------------------------------|
+| kubeconfig          | yaml-encoded parts of the output kubeconfig. It can be used to initialise terraform kubernetes provider in the root module |
+| subaccount_id       | subaccount ID of the created subaccount. It can be used to forcefully cleanup the subaccount i.e via BTP CLI               |
+| service_instance_id | service instance of the created Kyma environment                                                                           |
+| cluster_id          | cluster ID of the created Kyma environment                                                                                 |
+| domain              | domain of the created Kyma environment                                                                                     |
 
 ## Running `terraform-sap-kyma-on-btp` module
 
