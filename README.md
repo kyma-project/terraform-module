@@ -43,8 +43,115 @@ Terraform module for Kyma uses the following terraform [providers](provider.tf),
 | cluster_id          | cluster ID of the created Kyma environment                                                                                 |
 | domain              | domain of the created Kyma environment                                                                                     |
 
-## Running `terraform-sap-kyma-on-btp` module
+
+## How to use terraform module for kyma
+
+Please refer to the included usage [examples](./examples/).
+
+In order to use the module you need to create a dedicated folder in your project repository (for example `tf`). You will need to create a main terraform file (`main.tf`) and  `.tfvars` file. This will become the so called root terraform module where the module for kyma can be used as a child module.
+
+>> INFO: Read more about terraform modules in the [documentation form hasicorp](https://developer.hashicorp.com/terraform/language/modules)
+
+```
+.
++-- tf
+|   +-- main.tf
+|   +-- .tfvars
+```
+
+In the `.tfvars` file you will need to ensure [input parameters](#input-variables-tf-vars). Please refer to the [template](examples/kyma-on-btp-new-sa/.tfvars-template)
+
+For example:
+```tf
+BTP_BOT_USER = "..."
+BTP_BOT_PASSWORD = "..."
+BTP_GLOBAL_ACCOUNT = "..."
+BTP_BACKEND_URL = "https://cpcli.cf.sap.hana.ondemand.com"
+BTP_CUSTOM_IAS_TENANT = "my-tenant"
+BTP_CUSTOM_IAS_DOMAIN = "accounts400.ondemand.com"
+BTP_NEW_SUBACCOUNT_NAME = "kyma-runtime-subaccount"
+BTP_NEW_SUBACCOUNT_REGION = "eu21"
+BTP_KYMA_PLAN = "azure"
+BTP_KYMA_REGION = "westeurope"
+```
+
+In the `main.tf` file you need to ensure the [required providers](#required-providers) and include the kyma module as a child module.
+
+```tf
+
+provider "jq" {}
+provider "http" {}
+provider "btp" {
+  globalaccount = var.BTP_GLOBAL_ACCOUNT
+  cli_server_url = var.BTP_BACKEND_URL
+  idp            = var.BTP_CUSTOM_IAS_TENANT
+  username = var.BTP_BOT_USER
+  password = var.BTP_BOT_PASSWORD
+}
+
+module "kyma" {
+  source = "git::https://github.com/kyma-project/terraform-module.git?ref=v0.2.0"
+  BTP_KYMA_PLAN = var.BTP_KYMA_PLAN
+  BTP_NEW_SUBACCOUNT_NAME = var.BTP_NEW_SUBACCOUNT_NAME
+  BTP_CUSTOM_IAS_TENANT = var.BTP_CUSTOM_IAS_TENANT
+  BTP_CUSTOM_IAS_DOMAIN = var.BTP_CUSTOM_IAS_DOMAIN
+  BTP_KYMA_REGION = var.BTP_KYMA_REGION
+  BTP_BOT_USER = var.BTP_BOT_USER
+  BTP_BOT_PASSWORD = var.BTP_BOT_PASSWORD
+  BTP_NEW_SUBACCOUNT_REGION = var.BTP_NEW_SUBACCOUNT_REGION
+}
+
+//Use the outputs of kyma module as you wish..
+//Here it is simply forwarded as outputs of the root module
+output "subaccount_id" {
+  value = module.kyma.subaccount_id
+}
+
+output "service_instance_id" {
+  value = module.kyma.service_instance_id
+}
+
+output "cluster_id" {
+  value = module.kyma.cluster_id
+}
+
+output "domain" {
+  value = module.kyma.domain
+}
+
+//Use the kubeconfig output if you want to create/read k8s resources via [kubernetes terraform provider](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs)
+
+<!-- provider "kubernetes" {
+  cluster_ca_certificate = base64decode(local.kubeconfig.clusters.0.cluster.certificate-authority-data)
+  host                   = local.kubeconfig.clusters.0.cluster.server
+  token                  = local.kubeconfig.users.0.user.token
+} -->
+
+```
+
+Now you are ready to run the terraform CLI in your root module's folder
+
+```bash
+cd tf
+terraform init
+terraform apply -var-file=.tfvars -auto-approve 
+```
+
+Once terraform is finished, there will be a new `kubeconfig.yaml` file in the root module folder, providing you the access to the newly created Kyma runtime.
+
+```
+.
++-- tf
+|   +-- main.tf
+|   +-- .tfvars
+|   +-- kubeconfig.yaml
+```
+
+In order to destroy all resources you need to call the destroy command
+
+```bash
+terraform destroy -var-file=.tfvars -auto-approve        
+```
 
 
-The module should be included as a child module, and provided with a configured `sap/btp` terraform provider. The root module must define the values for the input variables. Go to the included [examples](./examples/).
 
