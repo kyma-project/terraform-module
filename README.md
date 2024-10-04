@@ -147,6 +147,12 @@ Once terraform is finished, there will be a new `kubeconfig.yaml` file in the ro
 |   +-- kubeconfig.yaml
 ```
 
+Use the `terraform output` command if you wish to read the output value, for example:
+
+```bash
+terraform output -raw cluster_id
+```
+
 In order to destroy all resources you need to call the destroy command
 
 ```bash
