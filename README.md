@@ -139,7 +139,7 @@ terraform init
 terraform apply -var-file=.tfvars -auto-approve 
 ```
 
-Once Terraform is finished, there will be a new `kubeconfig.yaml` file in the root module folder, providing you access to the newly created Kyma runtime.
+You should see a new `kubeconfig.yaml` file in the root module folder, providing you access to the newly created Kyma runtime.
 
 ```
 .
