@@ -44,13 +44,15 @@ Terraform module for Kyma uses the following terraform [providers](provider.tf),
 | domain              | domain of the created Kyma environment                                                                                     |
 
 
-## How to use terraform module for kyma
+## How to Use the Terraform Module for Kyma
 
-Please refer to the included usage [examples](./examples/).
+> [!NOTE]
+> See the included [usage examples](./examples/).
 
 In order to use the module you need to create a dedicated folder in your project repository (for example `tf`). You will need to create a main terraform file (`main.tf`) and  `.tfvars` file. This will become the so called root terraform module where the module for kyma can be used as a child module.
 
->> INFO: Read more about terraform modules in the [documentation form hasicorp](https://developer.hashicorp.com/terraform/language/modules)
+> [!NOTE] 
+> To learn more about Terraform modules, see [Modules](https://developer.hashicorp.com/terraform/language/modules)
 
 ```
 .
@@ -101,8 +103,8 @@ module "kyma" {
   BTP_NEW_SUBACCOUNT_REGION = var.BTP_NEW_SUBACCOUNT_REGION
 }
 
-//Use the outputs of kyma module as you wish..
-//Here it is simply forwarded as outputs of the root module
+//Use the outputs of the Kyma module as you wish.
+//Here it is forwarded as outputs of the root module.
 output "subaccount_id" {
   value = module.kyma.subaccount_id
 }
@@ -129,7 +131,7 @@ output "domain" {
 
 ```
 
-Now you are ready to run the terraform CLI in your root module's folder
+Now you are ready to run the Terraform CLI in your root module's folder.
 
 ```bash
 cd tf
@@ -137,7 +139,7 @@ terraform init
 terraform apply -var-file=.tfvars -auto-approve 
 ```
 
-Once terraform is finished, there will be a new `kubeconfig.yaml` file in the root module folder, providing you the access to the newly created Kyma runtime.
+Once Terraform is finished, there will be a new `kubeconfig.yaml` file in the root module folder, providing you access to the newly created Kyma runtime.
 
 ```
 .
@@ -147,13 +149,13 @@ Once terraform is finished, there will be a new `kubeconfig.yaml` file in the ro
 |   +-- kubeconfig.yaml
 ```
 
-Use the `terraform output` command if you wish to read the output value, for example:
+* To read the output value, use the `terraform output` command, for example:
 
 ```bash
 terraform output -raw cluster_id
 ```
 
-In order to destroy all resources you need to call the destroy command
+To destroy all resources, call the destroy command:
 
 ```bash
 terraform destroy -var-file=.tfvars -auto-approve        
