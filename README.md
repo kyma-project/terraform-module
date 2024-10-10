@@ -61,7 +61,7 @@ In order to use the module you need to create a dedicated folder in your project
 |   +-- .tfvars
 ```
 
-In the `.tfvars` file you will need to ensure [input parameters](#input-variables-tf-vars). Please refer to the [template](examples/kyma-on-btp-new-sa/.tfvars-template)
+2. In the `.tfvars` file, provide [input parameters](#input-variables-tf-vars). Refer to the [template](examples/kyma-on-btp-new-sa/.tfvars-template) file.
 
 For example:
 ```tf
@@ -77,7 +77,7 @@ BTP_KYMA_PLAN = "azure"
 BTP_KYMA_REGION = "westeurope"
 ```
 
-In the `main.tf` file you need to ensure the [required providers](#required-providers) and include the kyma module as a child module.
+3. In the `main.tf`, provide the [required providers](#required-providers) and include the Kyma module as a child module.
 
 ```tf
 
