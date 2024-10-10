@@ -49,7 +49,7 @@ Terraform module for Kyma uses the following terraform [providers](provider.tf),
 > [!NOTE]
 > See the included [usage examples](./examples/).
 
-In order to use the module you need to create a dedicated folder in your project repository (for example `tf`). You will need to create a main terraform file (`main.tf`) and  `.tfvars` file. This will become the so called root terraform module where the module for kyma can be used as a child module.
+1. To use the module, create a dedicated folder in your project repository (for example, `tf`), a main Terraform (`main.tf`) file, and `.tfvars` files. This will become the so-called root Terraform module, where the module for Kyma can be used as a child module.
 
 > [!NOTE] 
 > To learn more about Terraform modules, see [Modules](https://developer.hashicorp.com/terraform/language/modules)
@@ -131,7 +131,7 @@ output "domain" {
 
 ```
 
-Now you are ready to run the Terraform CLI in your root module's folder.
+4. Run the Terraform CLI in your root module's folder.
 
 ```bash
 cd tf
