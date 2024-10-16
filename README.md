@@ -77,7 +77,7 @@ BTP_KYMA_PLAN = "azure"
 BTP_KYMA_REGION = "westeurope"
 ```
 
-3. In the `main.tf`, provide the [required providers](#required-providers) and include the Kyma module as a child module.
+3. In the `main.tf`, ensure the [required providers](#required-providers) and include the Kyma module as a child module.
 
 ```tf
 
