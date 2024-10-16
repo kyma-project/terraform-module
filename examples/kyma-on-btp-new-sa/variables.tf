@@ -83,3 +83,8 @@ variable "BTP_KYMA_MODULES" {
   ]
   description = "The list of kyma modules to install"
 }
+
+variable "BTP_NEW_SUBACCOUNT_ADMINS" {
+  type = list(string)
+  default = [ ]
+}

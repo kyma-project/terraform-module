@@ -26,6 +26,12 @@ variable "BTP_NEW_SUBACCOUNT_REGION" {
   default     = "eu20"
 }
 
+variable "BTP_NEW_SUBACCOUNT_ADMINS" {
+  type = list(string)
+  description = "Usernames of the new subaccount admins"
+  default = [ ]
+}
+
 variable "BTP_CUSTOM_IAS_TENANT" {
   type        = string
   description = "Custom IAS tenant"

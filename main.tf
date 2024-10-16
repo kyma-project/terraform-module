@@ -233,3 +233,20 @@ resource "btp_subaccount" "subaccount" {
   subdomain = var.BTP_NEW_SUBACCOUNT_NAME
 }
 
+locals {
+  subaccount_admins = var.BTP_NEW_SUBACCOUNT_NAME != null && var.BTP_USE_SUBACCOUNT_ID == null ? var.BTP_NEW_SUBACCOUNT_ADMINS : []
+}
+
+resource "btp_subaccount_role_collection_assignment" "subaccount_admins" {
+  for_each =  toset(local.subaccount_admins)
+  subaccount_id = btp_subaccount.subaccount.0.id
+  role_collection_name = "Subaccount Administrator"
+  user_name = each.value
+}
+
+resource "btp_subaccount_role_collection_assignment" "subaccount_viewers" {
+  for_each =  toset(local.subaccount_admins)
+  subaccount_id = btp_subaccount.subaccount.0.id
+  role_collection_name = "Subaccount Viewer"
+  user_name = each.key
+}
