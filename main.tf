@@ -242,6 +242,11 @@ resource "btp_subaccount_role_collection_assignment" "subaccount_admins" {
   subaccount_id = btp_subaccount.subaccount.0.id
   role_collection_name = "Subaccount Administrator"
   user_name = each.value
+
+  // do not destroy potentially last admin of subaccount
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 resource "btp_subaccount_role_collection_assignment" "subaccount_viewers" {
