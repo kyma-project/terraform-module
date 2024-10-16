@@ -243,7 +243,7 @@ resource "btp_subaccount_role_collection_assignment" "subaccount_admins" {
   role_collection_name = "Subaccount Administrator"
   user_name = each.value
 
-  // do not destroy potentially last admin of subaccount
+  // do not destroy potentially the last admin of subaccount
   lifecycle {
     prevent_destroy = true
   }
