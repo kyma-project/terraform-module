@@ -8,7 +8,7 @@
 
 Terraform module that creates kyma runtime in SAP BTP platform.
 
-![image](./assets/sequence.png)
+![image](./assets/sequence.drawio.svg)
 
 ### Input Variables (TF vars)
 
@@ -32,6 +32,7 @@ Terraform module for Kyma uses the following terraform [providers](provider.tf),
  - `SAP/btp`
  - `massdriver-cloud/jq`
  - `hashicorp/http`
+ - `salrashid123/http-full`
 
 ### Outputs 
 
