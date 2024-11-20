@@ -43,43 +43,10 @@ resource "btp_subaccount_environment_instance" "kyma" {
   }
 }
 
-data "btp_subaccount_environment_instance" "kyma-instance" {
-  depends_on = [
-    btp_subaccount_environment_instance.kyma
-  ]
-  subaccount_id    = local.subaccount_id
-  id = btp_subaccount_environment_instance.kyma.id
-}
-
-
-data "http" "kubeconfig" {
-  url = jsondecode(btp_subaccount_environment_instance.kyma.labels).KubeconfigURL
-  retry {
-    attempts = 2
-    max_delay_ms = 2000
-    min_delay_ms = 1000
-  }
-  lifecycle {
-    postcondition {
-      condition     = can(regex("kind: Config",self.response_body))
-      error_message = "Invalid content of downloaded kubeconfig"
-    }
-  }
-}
-
-locals {
-  id_token = jsondecode(data.http.token.response_body).id_token
-  kubeconfig_oidc = yamldecode(data.http.kubeconfig.response_body)
-}
-
-data "jq_query" "kubeconfig" {
-  data = jsonencode(yamldecode(data.http.kubeconfig.response_body))
-  query = "del(.users[] | .user | .exec) | .users[] |= . + { user: { token: ${jsonencode(local.id_token)} } }"
-}
 
 resource "local_sensitive_file" "kubeconfig-yaml" {
   filename = "kubeconfig.yaml"
-  content  = yamlencode(jsondecode(data.jq_query.kubeconfig.result) )
+  content  = jsondecode(data.http.kymaruntime_bindings.response_body).credentials.kubeconfig
 }
 
 # wait for kyma readiness 
@@ -123,7 +90,6 @@ data "local_file" "domain" {
 }
 
 #"oidc.tf"
-
 resource "btp_subaccount_entitlement" "identity" {
   subaccount_id = local.subaccount_id
   service_name  = "identity"
@@ -155,7 +121,6 @@ resource "btp_subaccount_service_instance" "identity_application" {
       grant-types = [
         "authorization_code",
         "authorization_code_pkce_s256",
-        "password",
         "refresh_token"
       ],
       token-policy = {
@@ -209,16 +174,11 @@ resource "btp_subaccount_service_binding" "identity_application_binding" {
 
 locals {
   idp = jsondecode(btp_subaccount_service_binding.identity_application_binding.credentials)
+  cisCredentials = jsondecode(btp_subaccount_service_binding.cis-local-binding.credentials)
+  instance_id = btp_subaccount_environment_instance.kyma.id
+  cisBasicAuth = base64encode("${local.cisCredentials.uaa.clientid}:${local.cisCredentials.uaa.clientsecret}")
 }
 
-data "http" "token" {
-  url = "${local.idp.url}/oauth2/token"
-  method = "POST"
-  request_headers = {
-    Content-Type  = "application/x-www-form-urlencoded"
-  }
-  request_body = "grant_type=password&username=${var.BTP_BOT_USER}&password=${var.BTP_BOT_PASSWORD}&client_id=${local.idp.clientid}&scope=groups,email"
-}
 
 #"subaccount.tf"
 data "btp_subaccount" "reuse_subaccount" {
@@ -233,3 +193,69 @@ resource "btp_subaccount" "subaccount" {
   subdomain = var.BTP_NEW_SUBACCOUNT_NAME
 }
 
+# cis
+resource "btp_subaccount_entitlement" "cis" {
+  subaccount_id = local.subaccount_id
+  service_name  = "cis"
+  plan_name     = "local"
+}
+
+data "btp_subaccount_service_plan" "cis" {
+  depends_on     = [btp_subaccount_entitlement.cis]
+  subaccount_id = local.subaccount_id
+  offering_name = "cis"
+  name          = "local"
+}
+
+resource "btp_subaccount_service_instance" "cis-local" {
+  depends_on     = [btp_subaccount_entitlement.cis]
+  subaccount_id  = local.subaccount_id
+  name           = "cis-local"
+  serviceplan_id = data.btp_subaccount_service_plan.cis.id
+  parameters = jsonencode({
+      "grantType": "clientCredentials"
+  })
+}
+
+resource "btp_subaccount_service_binding" "cis-local-binding" {
+  depends_on          = [btp_subaccount_service_instance.cis-local]
+  subaccount_id       = local.subaccount_id
+  name                = "cis-local-binding"
+  service_instance_id = btp_subaccount_service_instance.cis-local.id
+}
+
+# fetch token for hana admin API using client-credential service binding
+data "http" "cis-api-token" {
+  depends_on = [
+    btp_subaccount_service_binding.cis-local-binding
+  ]
+  url    = "${local.cisCredentials.uaa.url}/oauth/token?grant_type=client_credentials"
+  method = "POST"
+  request_headers = {
+    Authorization = "Basic ${local.cisBasicAuth}"
+  }
+}
+
+# create kyma binding via provisioning API
+data "http" "kymaruntime_bindings" {
+  depends_on = [
+    data.http.cis-api-token,
+    local.instance_id
+  ]
+
+  provider = http-full
+
+  url = "${local.cisCredentials.endpoints.provisioning_service_url}/provisioning/v1/environments/${local.instance_id}/bindings"
+  method = "PUT"
+  request_headers = {
+    Authorization = "Bearer ${jsondecode(data.http.cis-api-token.response_body).access_token}"
+    Accept        = "application/json"
+    content-type  = "application/json"
+  } 
+
+  request_body = jsonencode({
+    "parameters": {
+      "expiration_seconds": 7200,
+    } 
+  })  
+}

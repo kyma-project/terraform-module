@@ -11,12 +11,17 @@ terraform {
       source = "hashicorp/http"
       version = "3.4.5"
     }
+    http-full = {
+      source = "salrashid123/http-full"
+      version = "1.3.1"
+    }
   }
 }
 
 
 provider "jq" {}
 provider "http" {}
+provider "http-full" {}
 
 provider "btp" {
   globalaccount = var.BTP_GLOBAL_ACCOUNT
