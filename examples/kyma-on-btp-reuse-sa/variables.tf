@@ -57,4 +57,5 @@ variable "BTP_KYMA_REGION" {
 
 variable "BTP_KYMA_CUSTOM_ADMINISTRATORS" {
   type = list(string)
+  default = []
 }
