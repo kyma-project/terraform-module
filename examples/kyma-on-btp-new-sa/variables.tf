@@ -47,13 +47,7 @@ variable "BTP_KYMA_PLAN" {
 variable "BTP_CUSTOM_IAS_TENANT" {
   type        = string
   description = "Custom IAS tenant"
-  default     = "custon-tenant"
-}
-
-variable "BTP_CUSTOM_IAS_DOMAIN" {
-  type        = string
-  description = "Custom IAS domain"
-  default     = "accounts.ondemand.com"
+  default     = "custom-tenant"
 }
 
 variable "BTP_KYMA_REGION" {
@@ -82,4 +76,8 @@ variable "BTP_KYMA_MODULES" {
     }
   ]
   description = "The list of kyma modules to install"
+}
+
+variable "BTP_KYMA_CUSTOM_ADMINISTRATORS" {
+  type = list(string)
 }

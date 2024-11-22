@@ -15,13 +15,10 @@ Terraform module that creates kyma runtime in SAP BTP platform.
 | NAME                       | MANDATORY | DEFAULT VALUE             | DESCRIPTION                                                                                                                                        |
 |----------------------------|-----------|---------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
 | BTP_GLOBAL_ACCOUNT         | true      |                           | UUID of SAP BTP Global Account                                                                                                                     |
-| BTP_BOT_USER               | true      |                           | Email of the technical user (shared mailbox)                                                                                                       |
-| BTP_BOT_PASSWORD           | true      |                           | Password of the techniacal user (created when inviting shared mailbox into custom SAP IAS tenant)                                                  |
 | BTP_USE_SUBACCOUNT_ID      | false     |                           | Provide an UUID of existing SAP BTP Subaccount to be used. Should not be combined with `BTP_NEW_SUBACCOUNT_*` inputs.                              |
 | BTP_NEW_SUBACCOUNT_NAME    | false     |                           | Provide a name for a new SAP BTP Subaccount to be created. Should not be combined with  `BTP_USE_SUBACCOUNT_ID` input.                             |
 | BTP_NEW_SUBACCOUNT_REGION  | false     |                           | Provide a region for a new SAP BTP Subaccount to be created. Should not be combined with  `BTP_USE_SUBACCOUNT_ID` input.                           |
 | BTP_CUSTOM_IAS_TENANT      | true      |                           | Provide the name of the custom SAP IAS tenant that is an authentication provider for the technical user.                                           |
-| BTP_CUSTOM_IAS_DOMAIN      | false     | accounts.ondemand.com     | Domain of the identity provider (on canary and staging environments this has to be set to `accounts400.ondemand.com`)                              |
 | BTP_BACKEND_URL            | false     | https://cli.btp.cloud.sap | URL of the BTP backend API (on canary environment this has to be set to  `https://cpcli.cf.sap.hana.ondemand.com`).                                |
 | BTP_KYMA_PLAN              | false     | azure                     | Use one of a valid kyma plans that you are entitled to use (One of: `azure`, `gcp`, `aws`,`sap-converged-cloud`)                                   |
 | BTP_KYMA_REGION            | false     | westeurope                | Use a valid kyma region that matches your selected kyma plan                                                                                       |
@@ -62,7 +59,7 @@ Terraform module for Kyma uses the following terraform [providers](provider.tf),
 |   +-- .tfvars
 ```
 
-2. In the `.tfvars` file, provide [input parameters](#input-variables-tf-vars). Refer to the [template](examples/kyma-on-btp-new-sa/.tfvars-template) file.
+2. In the `.tfvars` file, provide values that are necessary for the `kyma` child module (kyma module's [input parameters](#input-variables-tf-vars)) and the `sap/btp` provider.
 
 For example:
 ```tf
@@ -71,7 +68,6 @@ BTP_BOT_PASSWORD = "..."
 BTP_GLOBAL_ACCOUNT = "..."
 BTP_BACKEND_URL = "https://cpcli.cf.sap.hana.ondemand.com"
 BTP_CUSTOM_IAS_TENANT = "my-tenant"
-BTP_CUSTOM_IAS_DOMAIN = "accounts400.ondemand.com"
 BTP_NEW_SUBACCOUNT_NAME = "kyma-runtime-subaccount"
 BTP_NEW_SUBACCOUNT_REGION = "eu21"
 BTP_KYMA_PLAN = "azure"
@@ -95,12 +91,8 @@ provider "btp" {
 module "kyma" {
   source = "git::https://github.com/kyma-project/terraform-module.git?ref=v0.2.0"
   BTP_KYMA_PLAN = var.BTP_KYMA_PLAN
-  BTP_NEW_SUBACCOUNT_NAME = var.BTP_NEW_SUBACCOUNT_NAME
-  BTP_CUSTOM_IAS_TENANT = var.BTP_CUSTOM_IAS_TENANT
-  BTP_CUSTOM_IAS_DOMAIN = var.BTP_CUSTOM_IAS_DOMAIN
   BTP_KYMA_REGION = var.BTP_KYMA_REGION
-  BTP_BOT_USER = var.BTP_BOT_USER
-  BTP_BOT_PASSWORD = var.BTP_BOT_PASSWORD
+  BTP_NEW_SUBACCOUNT_NAME = var.BTP_NEW_SUBACCOUNT_NAME
   BTP_NEW_SUBACCOUNT_REGION = var.BTP_NEW_SUBACCOUNT_REGION
 }
 
