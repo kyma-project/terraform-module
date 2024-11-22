@@ -52,6 +52,7 @@ variable "BTP_CUSTOM_IAS_DOMAIN" {
 
 variable "BTP_KYMA_CUSTOM_ADMINISTRATORS" {
   type = list(string)
+  default = []
 }
 
 variable "BTP_KYMA_REGION" {

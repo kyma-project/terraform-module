@@ -80,4 +80,5 @@ variable "BTP_KYMA_MODULES" {
 
 variable "BTP_KYMA_CUSTOM_ADMINISTRATORS" {
   type = list(string)
+  default = []
 }
