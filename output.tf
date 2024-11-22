@@ -1,5 +1,5 @@
 output "kubeconfig" {
-  value = yamlencode(jsondecode(data.jq_query.kubeconfig.result) )
+  value = yamldecode(jsondecode(data.http.kymaruntime_bindings.response_body).credentials.kubeconfig)
 }
 
 output "subaccount_id" {

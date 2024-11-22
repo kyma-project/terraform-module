@@ -2,14 +2,15 @@ terraform {
   required_providers {
     btp = {
       source  = "SAP/btp"
-      version = "1.8.0"
     }
     jq = {
       source  = "massdriver-cloud/jq"
     }
     http = {
       source = "hashicorp/http"
-      version = "3.4.5"
+    }
+    http-full = {
+      source = "salrashid123/http-full"
     }
   }
 }
@@ -17,6 +18,7 @@ terraform {
 
 provider "jq" {}
 provider "http" {}
+provider "http-full" {}
 
 provider "btp" {
   globalaccount = var.BTP_GLOBAL_ACCOUNT
@@ -29,11 +31,7 @@ provider "btp" {
 module "kyma" {
   source = "../.."
   BTP_KYMA_PLAN = var.BTP_KYMA_PLAN
-  BTP_CUSTOM_IAS_TENANT = var.BTP_CUSTOM_IAS_TENANT
-  BTP_CUSTOM_IAS_DOMAIN = var.BTP_CUSTOM_IAS_DOMAIN
   BTP_KYMA_REGION = var.BTP_KYMA_REGION
-  BTP_BOT_USER = var.BTP_BOT_USER
-  BTP_BOT_PASSWORD = var.BTP_BOT_PASSWORD
   BTP_USE_SUBACCOUNT_ID = var.BTP_USE_SUBACCOUNT_ID
 }
 

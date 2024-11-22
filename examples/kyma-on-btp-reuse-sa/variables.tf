@@ -55,3 +55,6 @@ variable "BTP_KYMA_REGION" {
   default     = "westeurope"
 }
 
+variable "BTP_KYMA_CUSTOM_ADMINISTRATORS" {
+  type = list(string)
+}

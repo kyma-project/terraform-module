@@ -2,21 +2,27 @@ terraform {
   required_providers {
     btp = {
       source  = "SAP/btp"
-      version = "1.8.0"
     }
     jq = {
       source  = "massdriver-cloud/jq"
     }
     http = {
       source = "hashicorp/http"
-      version = "3.4.5"
     }
+    http-full = {
+      source = "salrashid123/http-full"
+    }
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = "~> 2.32.0"
+    }   
   }
 }
 
 
 provider "jq" {}
 provider "http" {}
+provider "http-full" {}
 
 provider "btp" {
   globalaccount = var.BTP_GLOBAL_ACCOUNT
@@ -26,17 +32,25 @@ provider "btp" {
   password = var.BTP_BOT_PASSWORD
 }
 
+# this shows how to configure kubernetes terraform provider with the output from terraform module for kyma
+locals {
+  kubeconfig = module.kyma.kubeconfig
+}
+
+provider "kubernetes" {
+  cluster_ca_certificate = base64decode(local.kubeconfig.clusters.0.cluster.certificate-authority-data)
+  host                   = local.kubeconfig.clusters.0.cluster.server
+  token                  = local.kubeconfig.users.0.user.token
+}
+
 module "kyma" {
   source = "../.."
   BTP_KYMA_PLAN = var.BTP_KYMA_PLAN
   BTP_NEW_SUBACCOUNT_NAME = var.BTP_NEW_SUBACCOUNT_NAME
-  BTP_CUSTOM_IAS_TENANT = var.BTP_CUSTOM_IAS_TENANT
-  BTP_CUSTOM_IAS_DOMAIN = var.BTP_CUSTOM_IAS_DOMAIN
   BTP_KYMA_REGION = var.BTP_KYMA_REGION
-  BTP_BOT_USER = var.BTP_BOT_USER
-  BTP_BOT_PASSWORD = var.BTP_BOT_PASSWORD
   BTP_NEW_SUBACCOUNT_REGION = var.BTP_NEW_SUBACCOUNT_REGION
   BTP_KYMA_MODULES = var.BTP_KYMA_MODULES
+  BTP_KYMA_CUSTOM_ADMINISTRATORS = var.BTP_KYMA_CUSTOM_ADMINISTRATORS
 }
 
 output "subaccount_id" {
@@ -53,4 +67,14 @@ output "cluster_id" {
 
 output "domain" {
   value = module.kyma.domain
+}
+
+# this shows how to use kubernetes terraform provider to read data from k8s cluster
+data "kubernetes_namespace" "default" {
+  depends_on = [
+    module.kyma.kubeconfig
+  ]
+  metadata {
+    name = "default"
+  }
 }
