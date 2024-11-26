@@ -3,9 +3,6 @@ terraform {
     btp = {
       source  = "SAP/btp"
     }
-    jq = {
-      source  = "massdriver-cloud/jq"
-    }
     http = {
       source = "hashicorp/http"
     }
@@ -19,8 +16,6 @@ terraform {
   }
 }
 
-
-provider "jq" {}
 provider "http" {}
 provider "http-full" {}
 

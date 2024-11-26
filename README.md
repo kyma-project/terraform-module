@@ -27,7 +27,6 @@ Terraform module that creates kyma runtime in SAP BTP platform.
 
 Terraform module for Kyma uses the following terraform [providers](provider.tf), which must be ensured by the root module:
  - `SAP/btp`
- - `massdriver-cloud/jq`
  - `hashicorp/http`
  - `salrashid123/http-full`
 
@@ -77,9 +76,22 @@ BTP_KYMA_REGION = "westeurope"
 3. In the `main.tf`, ensure the [required providers](#required-providers) and include the Kyma module as a child module.
 
 ```tf
+terraform {
+  required_providers {
+    btp = {
+      source  = "SAP/btp"
+    }
+    http = {
+      source = "hashicorp/http"
+    }
+    http-full = {
+      source = "salrashid123/http-full"
+    }
+  }
+}
 
-provider "jq" {}
 provider "http" {}
+provider "http-full" {}
 provider "btp" {
   globalaccount = var.BTP_GLOBAL_ACCOUNT
   cli_server_url = var.BTP_BACKEND_URL
@@ -89,7 +101,7 @@ provider "btp" {
 }
 
 module "kyma" {
-  source = "git::https://github.com/kyma-project/terraform-module.git?ref=v0.2.0"
+  source = "git::https://github.com/kyma-project/terraform-module.git?ref=v0.3.0"
   BTP_KYMA_PLAN = var.BTP_KYMA_PLAN
   BTP_KYMA_REGION = var.BTP_KYMA_REGION
   BTP_NEW_SUBACCOUNT_NAME = var.BTP_NEW_SUBACCOUNT_NAME
@@ -114,13 +126,6 @@ output "domain" {
   value = module.kyma.domain
 }
 
-//Use the kubeconfig output if you want to create/read k8s resources via [kubernetes terraform provider](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs)
-
-<!-- provider "kubernetes" {
-  cluster_ca_certificate = base64decode(local.kubeconfig.clusters.0.cluster.certificate-authority-data)
-  host                   = local.kubeconfig.clusters.0.cluster.server
-  token                  = local.kubeconfig.users.0.user.token
-} -->
 
 ```
 
