@@ -79,12 +79,12 @@ variable "BTP_KYMA_MODULES" {
 }
 
 variable "BTP_KYMA_AUTOSCALER_MIN" {
-  type: number
-  default: 3
+  type = number
+  default = 3
 }
 
 variable "BTP_KYMA_AUTOSCALER_MAX" {
-  type: number
-  default: 10
+  type = number
+  default = 10
 }
 
