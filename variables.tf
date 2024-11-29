@@ -78,3 +78,13 @@ variable "BTP_KYMA_MODULES" {
   description = "The list of kyma modules to install"
 }
 
+variable "BTP_KYMA_AUTOSCALER_MIN" {
+  type: number
+  default: 3
+}
+
+variable "BTP_KYMA_AUTOSCALER_MAX" {
+  type: number
+  default: 10
+}
+

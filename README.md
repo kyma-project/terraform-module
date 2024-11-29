@@ -22,6 +22,10 @@ Terraform module that creates kyma runtime in SAP BTP platform.
 | BTP_BACKEND_URL            | false     | https://cli.btp.cloud.sap | URL of the BTP backend API (on canary environment this has to be set to  `https://cpcli.cf.sap.hana.ondemand.com`).                                |
 | BTP_KYMA_PLAN              | false     | azure                     | Use one of a valid kyma plans that you are entitled to use (One of: `azure`, `gcp`, `aws`,`sap-converged-cloud`)                                   |
 | BTP_KYMA_REGION            | false     | westeurope                | Use a valid kyma region that matches your selected kyma plan                                                                                       |
+| BTP_KYMA_AUTOSCALER_MIN    | false     | 3                         | Minimum number of nodes |
+| BTP_KYMA_AUTOSCALER_MAX    | false     | 10                        | Maximum number of nodes |
+
+
 
 ### Required Providers
 
