@@ -26,6 +26,8 @@ resource "btp_subaccount_environment_instance" "kyma" {
     name   = "${local.subaccount_name}-kyma"
     region = var.BTP_KYMA_REGION
     administrators = var.BTP_KYMA_CUSTOM_ADMINISTRATORS
+    autoScalerMin = var.BTP_KYMA_AUTOSCALER_MIN
+    autoScalerMax = var.BTP_KYMA_AUTOSCALER_MAX
   })
   timeouts = {
     create = "60m"
