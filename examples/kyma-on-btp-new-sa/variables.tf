@@ -56,28 +56,6 @@ variable "BTP_KYMA_REGION" {
   default     = "westeurope"
 }
 
-variable "BTP_KYMA_MODULES" {
-  type = list(object({
-    name = string
-    channel = string
-  }))
-  default = [
-    {
-      name = "istio"
-      channel = "fast"
-    },
-    {
-      name = "api-gateway"
-      channel = "fast"
-    },
-    {
-      name = "btp-operator"
-      channel = "fast"
-    }
-  ]
-  description = "The list of kyma modules to install"
-}
-
 variable "BTP_KYMA_CUSTOM_ADMINISTRATORS" {
   type = list(string)
   default = []
