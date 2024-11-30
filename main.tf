@@ -59,8 +59,8 @@ resource "terraform_data" "wait-for-kyma-readiness" {
       kubectl wait --for condition=established crd/kymas.operator.kyma-project.io --kubeconfig $KUBECONFIG
       while ! kubectl get kyma default -n kyma-system --kubeconfig $KUBECONFIG; do echo "Waiting for default kyma CR..."; sleep 1; done
       kubectl wait --for='jsonpath={.status.state}=Ready' kymas.operator.kyma-project.io/default -n kyma-system --kubeconfig $KUBECONFIG --timeout=480s
-      while ! kubectl get secret sap-btp-operator-clusterid -n kyma-system --kubeconfig $KUBECONFIG; do echo "Waiting for sap-btp-operator-clusterid..."; sleep 1; done
-      kubectl get secret sap-btp-operator-clusterid -n kyma-system -ojsonpath={.data.INITIAL_CLUSTER_ID} --kubeconfig $KUBECONFIG > cluster_id.txt
+      while ! kubectl get secret sap-btp-manager -n kyma-system --kubeconfig $KUBECONFIG; do echo "Waiting for sap-btp-manager..."; sleep 1; done
+      kubectl get secret sap-btp-manager -n kyma-system -ojsonpath={.data.cluster_id} --kubeconfig $KUBECONFIG > cluster_id.txt
       while ! kubectl get cm shoot-info -n kube-system --kubeconfig $KUBECONFIG; do echo "Waiting for shoot-info cm..."; sleep 1; done
       kubectl get cm shoot-info -n kube-system -ojsonpath={.data.domain} --kubeconfig $KUBECONFIG  > domain.txt
        )
