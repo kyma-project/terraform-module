@@ -24,8 +24,8 @@ inputs:
 runs:
   using: 'composite'
   steps:
+    - uses: actions/checkout@v4
     - uses: ./.github/actions/setup-btp
-
     - name: Force delete btp resources
       shell: bash
       run: |
