@@ -24,11 +24,14 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - uses: actions/checkout@v4
-    - uses: ./.github/actions/setup-btp
     - name: Force delete btp resources
       shell: bash
       run: |
+        sudo ln -sf bash /bin/sh
+        curl -LJO https://tools.hana.ondemand.com/additional/btp-cli-linux-amd64-latest.tar.gz --cookie "eula_3_2_agreed=tools.hana.ondemand.com/developer-license-3_2.txt"
+        tar -zxf btp-cli-linux-amd64-latest.tar.gz --strip-components=1 -C /usr/local/bin
+        rm -f btp-cli-linux-amd64-latest.tar.gz
+        echo "BTP CLI downloaded into /usr/local/bin/btp"
         btp login --url "${{ inputs.btp_backend_url }}" --user "${{ inputs.btp_user }}" --password "${{ inputs.btp_password }}" --idp "${{ inputs.btp_idp_tenant }}"  --subdomain "${{ inputs.btp_global_account }}"
         echo "Deleting ${{ inputs.btp_global_account }}/${{ inputs.btp_subaccount_id }}".
         btp delete accounts/subaccount "${{ inputs.btp_subaccount_id }}" --global-account "${{ inputs.btp_global_account }}" --force-delete true --confirm true
