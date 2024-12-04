@@ -22,8 +22,6 @@ jobs:
           btp_subaccount_region: '${{ secrets.sa_region }}'
           btp_kyma_region: '${{ secrets.kyma_region }}'
           btp_kyma_plan: '${{ secrets.kyma_plan }}'
-          btp_kyma_modules: "[]"
-          btp_kyma_autoscaler_min: 3
       - name: kyma environment sanity check
         run: |
           kubectl get nodes

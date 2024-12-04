@@ -32,7 +32,7 @@ inputs:
   btp_kyma_modules:
     description: 'String representation of the requested kyma modules list that should be pre-installed on the kyma environments'
     required: false
-    default: "[{name = 'istio', channel = 'fast'},{name = 'api-gateway', channel = 'fast'},{name = 'btp-operator', channel = 'fast'}]"
+    default: "[{'name' = 'istio', 'channel' = 'fast'},{'name' = 'api-gateway', 'channel' = 'fast'},{'name' = 'btp-operator', 'channel' = 'fast'}]"
   btp_kyma_autoscaler_min:
     description: 'Minimum numbers of worker nodes the new kyma environment shoud start with'
     required: false
