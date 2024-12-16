@@ -52,3 +52,8 @@ variable "BTP_KYMA_AUTOSCALER_MIN" {
   type = number
   default = 3
 }
+
+variable "BTP_KYMA_CUSTOM_ADMINISTRATORS" {
+  type        = string
+  description = "Emails of kyma admins stringified array"
+}
