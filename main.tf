@@ -63,8 +63,8 @@ resource "terraform_data" "wait-for-kyma-readiness" {
       KUBECONFIG=kubeconfig.yaml
       set -e -o pipefail ;\
       if ! which kubectl; then
-        echo "Installing kubectl ..."
         STABLE=$(curl -L -s https://dl.k8s.io/release/stable.txt)
+        echo "Installing kubectl ${STABLE}..."
         curl -LO https://dl.k8s.io/release/${STABLE}/bin/linux/amd64/kubectl
         curl -LO "https://dl.k8s.io/${STABLE}/bin/linux/amd64/kubectl.sha256" &> /dev/null
         echo "Validating kubectl ..."
