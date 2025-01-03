@@ -12,16 +12,7 @@ resource "btp_subaccount_entitlement" "kyma" {
   amount        = 1
 }
 
-resource "btp_subaccount_entitlement" "sm-operator-access" {
-  subaccount_id = local.subaccount_id
-  service_name = "service-manager"
-  plan_name = "service-operator-access"
-}
-
 resource "btp_subaccount_environment_instance" "kyma" {
-  depends_on = [
-    resource.btp_subaccount_entitlement.sm-operator-access
-  ]
   subaccount_id    = local.subaccount_id
   name             = "${local.subaccount_name}-kyma"
   environment_type = "kyma"
