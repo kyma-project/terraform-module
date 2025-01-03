@@ -62,8 +62,15 @@ resource "terraform_data" "wait-for-kyma-readiness" {
        (
       KUBECONFIG=kubeconfig.yaml
       set -e -o pipefail ;\
-      curl -LO https://dl.k8s.io/release/v1.31.0/bin/linux/amd64/kubectl
-      chmod +x kubectl
+      if ! which kubectl; then
+        echo "Installing kubectl ..."
+        STABLE=$(curl -L -s https://dl.k8s.io/release/stable.txt)
+        curl -LO https://dl.k8s.io/release/${STABLE}/bin/linux/amd64/kubectl
+        curl -LO "https://dl.k8s.io/${STABLE}/bin/linux/amd64/kubectl.sha256" &> /dev/null
+        echo "Validating kubectl ..."
+        echo "$(<kubectl.sha256)  kubectl" | sha256sum --check
+        chmod +x kubectl
+      fi
       while ! kubectl get crd kymas.operator.kyma-project.io --kubeconfig $KUBECONFIG; do echo "Waiting for Kyma CRD..."; sleep 1; done
       kubectl wait --for condition=established crd/kymas.operator.kyma-project.io --kubeconfig $KUBECONFIG
       while ! kubectl get kyma default -n kyma-system --kubeconfig $KUBECONFIG; do echo "Waiting for default kyma CR..."; sleep 1; done
