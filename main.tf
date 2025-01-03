@@ -68,7 +68,7 @@ resource "terraform_data" "wait-for-kyma-readiness" {
         curl -LO https://dl.k8s.io/release/${STABLE}/bin/linux/amd64/kubectl
         curl -LO "https://dl.k8s.io/${STABLE}/bin/linux/amd64/kubectl.sha256" &> /dev/null
         echo "Validating kubectl ..."
-        echo "$(<kubectl.sha256)  kubectl" | sha256sum --check
+        echo "$(cat kubectl.sha256)  kubectl" | sha256sum --check
         chmod +x kubectl
       fi
       while ! kubectl get crd kymas.operator.kyma-project.io --kubeconfig $KUBECONFIG; do echo "Waiting for Kyma CRD..."; sleep 1; done
