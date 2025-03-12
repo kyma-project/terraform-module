@@ -46,7 +46,9 @@ outputs:
   subaccount_id: 
     value: ${{ steps.create-btp-resources.outputs.subaccount_id }}
     description: "ID of the created SAP BTP subaccount"
-
+  domain: 
+    value: ${{ steps.create-btp-resources.outputs.domain }}
+    description: "domain of the created SAP BTP Kyma Runtime"
 runs:
   using: 'composite'
   steps:
@@ -74,8 +76,10 @@ runs:
         terraform -chdir=${{ github.action_path }} init 
         terraform -chdir=${{ github.action_path }} apply -auto-approve 
         SUBACCOUNT_ID=$(terraform -chdir=${{ github.action_path }} output -raw subaccount_id)
+        DOMAIN=$(terraform -chdir=${{ github.action_path }} output -raw domain)
         echo ${SUBACCOUNT_ID}
         echo "subaccount_id=$SUBACCOUNT_ID" >> "$GITHUB_OUTPUT"
+        echo "domain=$DOMAIN" >> "$GITHUB_OUTPUT"
         echo "KUBECONFIG=${{ github.action_path }}/kubeconfig.yaml" >> "$GITHUB_ENV"
       shell: bash
       env:
