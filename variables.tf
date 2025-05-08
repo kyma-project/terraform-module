@@ -34,6 +34,7 @@ variable "BTP_KYMA_CUSTOM_OIDC" {
     usernamePrefix = string
     groupsClaim = string
     signingAlgs      = list(string)
+    requiredClaims = list(string)
   })
   default = null
 }
