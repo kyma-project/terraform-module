@@ -51,6 +51,11 @@ resource "local_sensitive_file" "kubeconfig-yaml" {
   content  = jsondecode(data.http.kymaruntime_bindings.response_body).credentials.kubeconfig
 }
 
+resource "local_sensitive_file" "ca-cert" {
+  filename = "CA.crt"
+  content  = base64decode(yamldecode(jsondecode(data.http.kymaruntime_bindings.response_body).credentials.kubeconfig).clusters.0.cluster.certificate-authority-data)
+}
+
 # wait for kyma readiness 
 resource "terraform_data" "wait-for-kyma-readiness" {
   depends_on = [

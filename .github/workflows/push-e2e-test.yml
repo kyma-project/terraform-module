@@ -16,6 +16,16 @@ jobs:
         run: |
           terraform init
           terraform apply -auto-approve
+
+          kubectl auth can-i --kubeconfig=kubeconfig.yaml update kymas
+          
+          APISERVER_URL=$(terraform output --raw apiserver_url)
+          TOKEN=$(cat kubeconfig.yaml | yq .users.0.user.token)
+          kubectl auth can-i update kymas \
+            --token=$TOKEN \
+            --server=$APISERVER_URL \
+            --certificate-authority=CA.crt
+
           terraform destroy -auto-approve
         env:
           TF_VAR_BTP_NEW_SUBACCOUNT_NAME: tf-kyma-module-test-${{ steps.vars.outputs.sha_short }}-${{ github.run_attempt }}

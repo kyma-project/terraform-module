@@ -68,6 +68,10 @@ output "domain" {
   value = module.kyma.domain
 }
 
+output "apiserver_url" {
+  value = module.kyma.apiserver_url
+}
+
 # this shows how to use kubernetes terraform provider to read data from k8s cluster
 data "kubernetes_namespace" "default" {
   depends_on = [
