@@ -19,5 +19,5 @@ output "domain" {
 }
 
 output "apiserver_url" {
-  value = yamldecode(yamldecode(jsondecode(data.http.kymaruntime_bindings.response_body).credentials.kubeconfig).clusters.0.cluster.server)
+  value = yamldecode(jsondecode(data.http.kymaruntime_bindings.response_body).credentials.kubeconfig).clusters.0.cluster.server
 }
