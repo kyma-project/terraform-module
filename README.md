@@ -43,6 +43,8 @@ Terraform module for Kyma uses the following terraform [providers](provider.tf),
 | service_instance_id | service instance of the created Kyma environment                                                                           |
 | cluster_id          | cluster ID of the created Kyma environment                                                                                 |
 | domain              | domain of the created Kyma environment                                                                                     |
+| apiserver_url       | URL of the kubernetes API server of the created Kyma environment                                                           |
+
 
 
 ## How to Use the Terraform Module for Kyma
@@ -141,7 +143,7 @@ terraform init
 terraform apply -var-file=.tfvars -auto-approve 
 ```
 
-You should see a new `kubeconfig.yaml` file in the root module folder, providing you access to the newly created Kyma runtime.
+You should see a new `kubeconfig.yaml` file in the root module folder, providing you access to the newly created Kyma runtime and the `CA.crt` file for the certificate authority.
 
 ```
 .
@@ -149,6 +151,7 @@ You should see a new `kubeconfig.yaml` file in the root module folder, providing
 |   +-- main.tf
 |   +-- .tfvars
 |   +-- kubeconfig.yaml
+|   +-- CA.crt
 ```
 
 * To read the output value, use the `terraform output` command, for example:
