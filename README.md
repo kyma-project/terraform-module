@@ -143,7 +143,7 @@ terraform init
 terraform apply -var-file=.tfvars -auto-approve 
 ```
 
-You should see a new `kubeconfig.yaml` file in the root module folder, providing you access to the newly created Kyma runtime.
+You should see a new `kubeconfig.yaml` file in the root module folder, providing you access to the newly created Kyma runtime and the `CA.crt` file for the certificate authority.
 
 ```
 .
@@ -151,6 +151,7 @@ You should see a new `kubeconfig.yaml` file in the root module folder, providing
 |   +-- main.tf
 |   +-- .tfvars
 |   +-- kubeconfig.yaml
+|   +-- CA.crt
 ```
 
 * To read the output value, use the `terraform output` command, for example:
