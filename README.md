@@ -43,6 +43,8 @@ Terraform module for Kyma uses the following terraform [providers](provider.tf),
 | service_instance_id | service instance of the created Kyma environment                                                                           |
 | cluster_id          | cluster ID of the created Kyma environment                                                                                 |
 | domain              | domain of the created Kyma environment                                                                                     |
+| apiserver_url       | URL of the kubernetes API server of the created Kyma environment                                                           |
+
 
 
 ## How to Use the Terraform Module for Kyma
