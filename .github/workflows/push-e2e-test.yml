@@ -11,6 +11,10 @@ jobs:
       - name: compute github commit sha
         id: vars
         run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
       - name: Create kyma runtime on btp
         working-directory: examples/kyma-on-btp-new-sa
         run: |
