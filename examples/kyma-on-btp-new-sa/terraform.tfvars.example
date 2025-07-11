@@ -1,9 +1,12 @@
+# Rename this file as `terraform.tfvars` and provide values for the variables
 
-# Copy this file as `local.tfvars` and provide values 
+BTP_NEW_SUBACCOUNT_NAME = ""
 
-BTP_USE_SUBACCOUNT_ID = ""
-BTP_BOT_USER = ""
-BTP_BOT_PASSWORD = ""
+# one of many available regions (without the `cf-` prefix!). I.e `eu20`
+BTP_NEW_SUBACCOUNT_REGION = ""
+
+BTP_BOT_USER       = ""
+BTP_BOT_PASSWORD   = ""
 BTP_GLOBAL_ACCOUNT = ""
 
 # optional. will default to `https://cli.btp.cloud.sap`. For Canary landscape use `https://cpcli.cf.sap.hana.ondemand.com`
@@ -18,4 +21,4 @@ BTP_KYMA_PLAN = ""
 BTP_KYMA_REGION = ""
 
 # Optional
-BTP_KYMA_CUSTOM_ADMINISTRATORS= ""
+BTP_KYMA_CUSTOM_ADMINISTRATORS = ""

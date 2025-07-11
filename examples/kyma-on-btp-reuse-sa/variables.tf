@@ -1,22 +1,19 @@
 # we're using uppercase variable names, since in some cases (e.g Azure DevOps) the system variables are forced to be uppercase
 # TF allows providing variable values as env variables of name name, case sensitive
-
 variable "BTP_GLOBAL_ACCOUNT" {
   type        = string
-  description = "Global account name"
-  default     = "global-account-guid"
+  description = "Subdomain of the SAP BTP global account"
 }
 
 variable "BTP_BOT_USER" {
   type        = string
   description = "Bot account name"
-  default     = "email@domain.com"
 }
 
 variable "BTP_BOT_PASSWORD" {
   type        = string
   description = "Bot account password"
-  default     = "password"
+  sensitive   = true
 }
 
 variable "BTP_BACKEND_URL" {
@@ -27,8 +24,7 @@ variable "BTP_BACKEND_URL" {
 
 variable "BTP_USE_SUBACCOUNT_ID" {
   type        = string
-  description = "Subaccount name"
-  default     = null
+  description = "ID of the subaccount to be reused"
 }
 
 variable "BTP_KYMA_PLAN" {
@@ -56,6 +52,6 @@ variable "BTP_KYMA_REGION" {
 }
 
 variable "BTP_KYMA_CUSTOM_ADMINISTRATORS" {
-  type = list(string)
+  type    = list(string)
   default = []
 }
