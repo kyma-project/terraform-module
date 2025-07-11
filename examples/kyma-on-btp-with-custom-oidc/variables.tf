@@ -3,21 +3,18 @@
 
 variable "BTP_GLOBAL_ACCOUNT" {
   type        = string
-  description = "Global account name"
-  default     = "global-account-guid"
+  description = "Subdomain of the SAP BTP global account"
 }
 
 variable "BTP_BOT_USER" {
   type        = string
   description = "Bot account name"
-  default     = "email@domain.com"
 }
 
 variable "BTP_BOT_PASSWORD" {
   type        = string
   description = "Bot account password"
-  default     = "password"
-  sensitive = true
+  sensitive   = true
 }
 
 variable "BTP_BACKEND_URL" {
@@ -28,8 +25,7 @@ variable "BTP_BACKEND_URL" {
 
 variable "BTP_USE_SUBACCOUNT_ID" {
   type        = string
-  description = "Subaccount name"
-  default     = null
+  description = "ID of the subaccount"
 }
 
 variable "BTP_KYMA_PLAN" {
@@ -51,7 +47,7 @@ variable "BTP_CUSTOM_IAS_DOMAIN" {
 }
 
 variable "BTP_KYMA_CUSTOM_ADMINISTRATORS" {
-  type = list(string)
+  type    = list(string)
   default = []
 }
 
@@ -63,20 +59,20 @@ variable "BTP_KYMA_REGION" {
 
 variable "BTP_KYMA_MODULES" {
   type = list(object({
-    name = string
+    name    = string
     channel = string
   }))
   default = [
     {
-      name = "istio"
+      name    = "istio"
       channel = "fast"
     },
     {
-      name = "api-gateway"
+      name    = "api-gateway"
       channel = "fast"
     },
     {
-      name = "btp-operator"
+      name    = "btp-operator"
       channel = "fast"
     }
   ]
