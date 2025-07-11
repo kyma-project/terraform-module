@@ -1,9 +1,38 @@
-# "kyma.tf"
+data "btp_subaccount" "reuse_subaccount" {
+  count = var.BTP_USE_SUBACCOUNT_ID != null ? 1 : 0
+  id    = var.BTP_USE_SUBACCOUNT_ID
+}
 
 locals {
-  subaccount_name = var.BTP_USE_SUBACCOUNT_ID != null && var.BTP_NEW_SUBACCOUNT_NAME ==null ? one(data.btp_subaccount.reuse_subaccount).name : one(btp_subaccount.subaccount).name
-  subaccount_id   = var.BTP_USE_SUBACCOUNT_ID != null && var.BTP_NEW_SUBACCOUNT_NAME ==null ? one(data.btp_subaccount.reuse_subaccount).id : one(btp_subaccount.subaccount).id
+  subaccount_name = var.BTP_USE_SUBACCOUNT_ID != null ? one(data.btp_subaccount.reuse_subaccount).name : one(btp_subaccount.subaccount).name
+  subaccount_id   = var.BTP_USE_SUBACCOUNT_ID != null ? one(data.btp_subaccount.reuse_subaccount).id : one(btp_subaccount.subaccount).id
+  default_kyma_modules = [
+    {
+      name    = "istio"
+      channel = "fast"
+    },
+    {
+      name    = "api-gateway"
+      channel = "fast"
+    },
+    {
+      name    = "btp-operator"
+      channel = "fast"
+    }
+  ]
+  merged_kyma_modules = distinct(concat(local.default_kyma_modules, var.BTP_KYMA_MODULES))
 }
+
+###
+# Setup the subaccount including entitlements for Kyma
+###
+resource "btp_subaccount" "subaccount" {
+  count     = var.BTP_USE_SUBACCOUNT_ID == null ? 1 : 0
+  name      = var.BTP_NEW_SUBACCOUNT_NAME
+  region    = var.BTP_NEW_SUBACCOUNT_REGION
+  subdomain = var.BTP_NEW_SUBACCOUNT_NAME
+}
+
 
 resource "btp_subaccount_entitlement" "kyma" {
   subaccount_id = local.subaccount_id
@@ -14,10 +43,65 @@ resource "btp_subaccount_entitlement" "kyma" {
 
 resource "btp_subaccount_entitlement" "sm-operator-access" {
   subaccount_id = local.subaccount_id
-  service_name = "service-manager"
-  plan_name = "service-operator-access"
+  service_name  = "service-manager"
+  plan_name     = "service-operator-access"
 }
 
+###
+# Setup CIS
+###
+resource "btp_subaccount_entitlement" "cis" {
+  subaccount_id = local.subaccount_id
+  service_name  = "cis"
+  plan_name     = "local"
+}
+
+data "btp_subaccount_service_plan" "cis" {
+  depends_on = [btp_subaccount_entitlement.cis]
+
+  subaccount_id = local.subaccount_id
+  offering_name = "cis"
+  name          = "local"
+}
+
+resource "btp_subaccount_service_instance" "cis-local" {
+  depends_on = [btp_subaccount_entitlement.cis]
+
+  subaccount_id  = local.subaccount_id
+  name           = "cis-local"
+  serviceplan_id = data.btp_subaccount_service_plan.cis.id
+  parameters = jsonencode({
+    "grantType" : "clientCredentials"
+  })
+}
+
+resource "btp_subaccount_service_binding" "cis-local-binding" {
+  depends_on = [btp_subaccount_service_instance.cis-local]
+
+  subaccount_id       = local.subaccount_id
+  name                = "cis-local-binding"
+  service_instance_id = btp_subaccount_service_instance.cis-local.id
+}
+
+locals {
+  cisCredentials = jsondecode(btp_subaccount_service_binding.cis-local-binding.credentials)
+  cisBasicAuth   = base64encode("${local.cisCredentials.uaa.clientid}:${local.cisCredentials.uaa.clientsecret}")
+}
+
+# Fetch token from CIS API using client-credential service binding
+data "http" "cis-api-token" {
+  depends_on = [btp_subaccount_service_binding.cis-local-binding]
+
+  url    = "${local.cisCredentials.uaa.url}/oauth/token?grant_type=client_credentials"
+  method = "POST"
+  request_headers = {
+    Authorization = "Basic ${local.cisBasicAuth}"
+  }
+}
+
+###
+# Setup the Kyma environment
+###
 resource "btp_subaccount_environment_instance" "kyma" {
   depends_on = [
     resource.btp_subaccount_entitlement.sm-operator-access
@@ -28,24 +112,49 @@ resource "btp_subaccount_environment_instance" "kyma" {
   service_name     = btp_subaccount_entitlement.kyma.service_name
   plan_name        = btp_subaccount_entitlement.kyma.plan_name
   parameters = jsonencode({
-    modules = {
-      list = var.BTP_KYMA_MODULES
-    }
-    oidc = var.BTP_KYMA_CUSTOM_OIDC
-    name   = "${local.subaccount_name}-kyma"
-    region = var.BTP_KYMA_REGION
+    modules        = { list = local.merged_kyma_modules }
+    oidc           = var.BTP_KYMA_CUSTOM_OIDC
+    name           = "${local.subaccount_name}-kyma"
+    region         = var.BTP_KYMA_REGION
     administrators = var.BTP_KYMA_CUSTOM_ADMINISTRATORS
-    autoScalerMin = var.BTP_KYMA_AUTOSCALER_MIN
-    autoScalerMax = var.BTP_KYMA_AUTOSCALER_MAX
+    autoScalerMin  = var.BTP_KYMA_AUTOSCALER_MIN
+    autoScalerMax  = var.BTP_KYMA_AUTOSCALER_MAX
   })
   timeouts = {
-    create = "60m"
-    update = "30m"
-    delete = "60m"
+    create = var.BTP_KYMA_SETUP_TIMEOUTS.create
+    update = var.BTP_KYMA_SETUP_TIMEOUTS.update
+    delete = var.BTP_KYMA_SETUP_TIMEOUTS.delete
   }
 }
 
+###
+# Create Kyma environment binding via CIS provisioning API
+###
+# TODO: Replace with terracurl to reflect CREATE, UPDATE and DELETE operations https://registry.terraform.io/providers/devops-rob/terracurl/1.2.2
+# For DELETE we must make a READ request first to get the binding ID
+data "http" "kymaruntime_bindings" {
+  depends_on = [data.http.cis-api-token, btp_subaccount_environment_instance.kyma]
 
+  provider = http-full
+
+  url    = "${local.cisCredentials.endpoints.provisioning_service_url}/provisioning/v1/environments/${local.btp_subaccount_environment_instance.kyma.id}/bindings"
+  method = "PUT"
+  request_headers = {
+    Authorization = "Bearer ${jsondecode(data.http.cis-api-token.response_body).access_token}"
+    Accept        = "application/json"
+    content-type  = "application/json"
+  }
+
+  request_body = jsonencode({
+    "parameters" : {
+      "expiration_seconds" : 7200,
+    }
+  })
+}
+
+###
+# Store the kubeconfig and CA certificate in local files after CIS binding is available
+###
 resource "local_sensitive_file" "kubeconfig-yaml" {
   filename = "kubeconfig.yaml"
   content  = jsondecode(data.http.kymaruntime_bindings.response_body).credentials.kubeconfig
@@ -56,14 +165,16 @@ resource "local_sensitive_file" "ca-cert" {
   content  = base64decode(yamldecode(jsondecode(data.http.kymaruntime_bindings.response_body).credentials.kubeconfig).clusters.0.cluster.certificate-authority-data)
 }
 
-# wait for kyma readiness 
+###
+# Wait for Kyma to become ready and extract the cluster ID and domain and write it to the local file system
+###
+# TODO Rewrite the script to have the script in a seperate file and react on the ritht OS acrhictecture namely amd64 and arm64
 resource "terraform_data" "wait-for-kyma-readiness" {
-  depends_on = [
-    resource.local_sensitive_file.kubeconfig-yaml
-  ]
+  depends_on = [resource.local_sensitive_file.kubeconfig-yaml]
+
   provisioner "local-exec" {
     interpreter = ["/bin/bash", "-c"]
-     command = <<EOF
+    command     = <<EOF
        (
       KUBECONFIG=kubeconfig.yaml
       set -e -o pipefail ;\
@@ -85,106 +196,19 @@ resource "terraform_data" "wait-for-kyma-readiness" {
       kubectl get cm shoot-info -n kube-system -ojsonpath={.data.domain} --kubeconfig $KUBECONFIG  > domain.txt
        )
      EOF
-  } 
+  }
 }
 
+
+###
+# Read the  cluster ID and domain from the local file system - needed to transfer the information to the output
+###
 data "local_file" "cluster_id" {
-  depends_on = [
-    resource.terraform_data.wait-for-kyma-readiness
-  ]
+  depends_on = [resource.terraform_data.wait-for-kyma-readiness]
   filename = "cluster_id.txt"
 }
 
 data "local_file" "domain" {
-  depends_on = [
-    resource.terraform_data.wait-for-kyma-readiness
-  ]
+  depends_on = [resource.terraform_data.wait-for-kyma-readiness]
   filename = "domain.txt"
-}
-
-locals {
-  cisCredentials = jsondecode(btp_subaccount_service_binding.cis-local-binding.credentials)
-  instance_id = btp_subaccount_environment_instance.kyma.id
-  cisBasicAuth = base64encode("${local.cisCredentials.uaa.clientid}:${local.cisCredentials.uaa.clientsecret}")
-}
-
-
-#"subaccount.tf"
-data "btp_subaccount" "reuse_subaccount" {
-  count = var.BTP_USE_SUBACCOUNT_ID != null && var.BTP_NEW_SUBACCOUNT_NAME == null ? 1 : 0
-  id = var.BTP_USE_SUBACCOUNT_ID
-}
-
-resource "btp_subaccount" "subaccount" {
-  count = var.BTP_NEW_SUBACCOUNT_NAME != null && var.BTP_USE_SUBACCOUNT_ID == null ? 1 : 0
-  name      = var.BTP_NEW_SUBACCOUNT_NAME
-  region    = var.BTP_NEW_SUBACCOUNT_REGION
-  subdomain = var.BTP_NEW_SUBACCOUNT_NAME
-}
-
-# cis
-resource "btp_subaccount_entitlement" "cis" {
-  subaccount_id = local.subaccount_id
-  service_name  = "cis"
-  plan_name     = "local"
-}
-
-data "btp_subaccount_service_plan" "cis" {
-  depends_on     = [btp_subaccount_entitlement.cis]
-  subaccount_id = local.subaccount_id
-  offering_name = "cis"
-  name          = "local"
-}
-
-resource "btp_subaccount_service_instance" "cis-local" {
-  depends_on     = [btp_subaccount_entitlement.cis]
-  subaccount_id  = local.subaccount_id
-  name           = "cis-local"
-  serviceplan_id = data.btp_subaccount_service_plan.cis.id
-  parameters = jsonencode({
-      "grantType": "clientCredentials"
-  })
-}
-
-resource "btp_subaccount_service_binding" "cis-local-binding" {
-  depends_on          = [btp_subaccount_service_instance.cis-local]
-  subaccount_id       = local.subaccount_id
-  name                = "cis-local-binding"
-  service_instance_id = btp_subaccount_service_instance.cis-local.id
-}
-
-# fetch token for hana admin API using client-credential service binding
-data "http" "cis-api-token" {
-  depends_on = [
-    btp_subaccount_service_binding.cis-local-binding
-  ]
-  url    = "${local.cisCredentials.uaa.url}/oauth/token?grant_type=client_credentials"
-  method = "POST"
-  request_headers = {
-    Authorization = "Basic ${local.cisBasicAuth}"
-  }
-}
-
-# create kyma binding via provisioning API
-data "http" "kymaruntime_bindings" {
-  depends_on = [
-    data.http.cis-api-token,
-    local.instance_id
-  ]
-
-  provider = http-full
-
-  url = "${local.cisCredentials.endpoints.provisioning_service_url}/provisioning/v1/environments/${local.instance_id}/bindings"
-  method = "PUT"
-  request_headers = {
-    Authorization = "Bearer ${jsondecode(data.http.cis-api-token.response_body).access_token}"
-    Accept        = "application/json"
-    content-type  = "application/json"
-  } 
-
-  request_body = jsonencode({
-    "parameters": {
-      "expiration_seconds": 7200,
-    } 
-  })  
 }
