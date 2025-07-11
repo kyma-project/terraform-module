@@ -3,21 +3,18 @@
 
 variable "BTP_GLOBAL_ACCOUNT" {
   type        = string
-  description = "Global account name"
-  default     = "global-account-guid"
+  description = "Subdomain fo the SAP BTP global account"
 }
 
 variable "BTP_BOT_USER" {
   type        = string
   description = "Bot account name"
-  default     = "email@domain.com"
 }
 
 variable "BTP_BOT_PASSWORD" {
   type        = string
   description = "Bot account password"
-  default     = "password"
-  sensitive = true
+  sensitive   = true
 }
 
 variable "BTP_BACKEND_URL" {
@@ -57,6 +54,6 @@ variable "BTP_KYMA_REGION" {
 }
 
 variable "BTP_KYMA_CUSTOM_ADMINISTRATORS" {
-  type = list(string)
+  type    = list(string)
   default = []
 }
