@@ -7,7 +7,6 @@ variable "BTP_BACKEND_URL" {
   default     = "https://cli.btp.cloud.sap"
 }
 
-
 variable "BTP_USE_SUBACCOUNT_ID" {
   type        = string
   description = "ID of the subaccount to be used for the Kyma cluster"
@@ -133,7 +132,7 @@ variable "BTP_KYMA_CUSTOM_OIDC" {
   })
   default = null
   validation {
-    condition     = var.BTP_KYMA_CUSTOM_OIDC == null || (length(trim(var.BTP_KYMA_CUSTOM_OIDC.clientID)) > 0 && length(trim(var.BTP_KYMA_CUSTOM_OIDC.issuerURL)) > 0)
+    condition     = var.BTP_KYMA_CUSTOM_OIDC == null || (length(var.BTP_KYMA_CUSTOM_OIDC.clientID) > 0 && length(var.BTP_KYMA_CUSTOM_OIDC.issuerURL) > 0)
     error_message = "If the variable BTP_KYMA_CUSTOM_OIDC is provided, both clientID and issuerURL must be set and non-empty."
   }
 }
