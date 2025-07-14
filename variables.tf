@@ -70,10 +70,10 @@ variable "BTP_KYMA_AUTOSCALER_MIN" {
   default     = 3
   validation {
     condition = contains(["aws", "azure", "gcp"], var.BTP_KYMA_PLAN) ? (
-      var.BTP_KYMA_AUTOSCALER_MIN >= 3 && var.BTP_KYMA_AUTOSCALER_MIN <= var.BTP_KYMA_AUTOSCALER_MAX
+      var.BTP_KYMA_AUTOSCALER_MIN >= 3
       ) : (
       var.BTP_KYMA_PLAN == "azure-lite" ? (
-        var.BTP_KYMA_AUTOSCALER_MIN >= 2 && var.BTP_KYMA_AUTOSCALER_MIN <= var.BTP_KYMA_AUTOSCALER_MAX
+        var.BTP_KYMA_AUTOSCALER_MIN >= 2
       ) : true
     )
     error_message = "The value of BTP_KYMA_AUTOSCALER_MIN must be between 3 and BTP_KYMA_AUTOSCALER_MAX if BTP_KYMA_PLAN is aws, azure, or gcp; or between 2 and BTP_KYMA_AUTOSCALER_MAX if plan is azure-lite."

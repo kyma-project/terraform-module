@@ -103,9 +103,8 @@ data "http" "cis-api-token" {
 # Setup the Kyma environment
 ###
 resource "btp_subaccount_environment_instance" "kyma" {
-  depends_on = [
-    resource.btp_subaccount_entitlement.sm-operator-access
-  ]
+  depends_on = [resource.btp_subaccount_entitlement.sm-operator-access]
+
   subaccount_id    = local.subaccount_id
   name             = "${local.subaccount_name}-kyma"
   environment_type = "kyma"
@@ -130,26 +129,58 @@ resource "btp_subaccount_environment_instance" "kyma" {
 ###
 # Create Kyma environment binding via CIS provisioning API
 ###
-# TODO: Replace with terracurl to reflect CREATE, UPDATE and DELETE operations https://registry.terraform.io/providers/devops-rob/terracurl/1.2.2
+
 # For DELETE we must make a READ request first to get the binding ID
-data "http" "kymaruntime_bindings" {
+data "http" "cis-kyma-env-binding-read" {
   depends_on = [data.http.cis-api-token, btp_subaccount_environment_instance.kyma]
 
-  provider = http-full
-
-  url    = "${local.cisCredentials.endpoints.provisioning_service_url}/provisioning/v1/environments/${local.btp_subaccount_environment_instance.kyma.id}/bindings"
-  method = "PUT"
+  url    = "${local.cisCredentials.endpoints.provisioning_service_url}/provisioning/v1/environments/${btp_subaccount_environment_instance.kyma.id}/bindings"
+  method = "GET"
   request_headers = {
     Authorization = "Bearer ${jsondecode(data.http.cis-api-token.response_body).access_token}"
     Accept        = "application/json"
     content-type  = "application/json"
   }
+}
 
-  request_body = jsonencode({
-    "parameters" : {
-      "expiration_seconds" : 7200,
-    }
-  })
+locals {
+  existing_binding_id = length(data.http.cis-kyma-env-binding-read.response_body) > 0 ? jsondecode(data.http.cis-kyma-env-binding-read.response_body).bindings[0].bindingId : null
+}
+
+resource "terracurl_request" "cis-kyma-env-binding" {
+  depends_on = [data.http.cis-api-token, btp_subaccount_environment_instance.kyma]
+
+  name         = "cis-kyma-env-binding"
+  url          = "${local.cisCredentials.endpoints.provisioning_service_url}/provisioning/v1/environments/${btp_subaccount_environment_instance.kyma.id}/bindings"
+  method       = "PUT"
+  request_body = <<EOF
+{
+  "parameters": {
+    "expiration_seconds" : 7200,
+  }
+}
+
+EOF
+
+  headers = {
+    Authorization = "Bearer ${jsondecode(data.http.cis-api-token.response_body).access_token}"
+    Accept        = "application/json"
+    content-type  = "application/json"
+  }
+
+  response_codes = [202]
+
+  destroy_url    = "${local.cisCredentials.endpoints.provisioning_service_url}/provisioning/v1/environments/${btp_subaccount_environment_instance.kyma.id}/bindings/"
+  destroy_method = "DELETE"
+
+  destroy_headers = {
+    Authorization = "Bearer ${jsondecode(data.http.cis-api-token.response_body).access_token}"
+    Accept        = "application/json"
+    content-type  = "application/json"
+  }
+
+  destroy_response_codes = [200]
+
 }
 
 ###
@@ -157,12 +188,12 @@ data "http" "kymaruntime_bindings" {
 ###
 resource "local_sensitive_file" "kubeconfig-yaml" {
   filename = "kubeconfig.yaml"
-  content  = jsondecode(data.http.kymaruntime_bindings.response_body).credentials.kubeconfig
+  content  = jsondecode(terracurl_request.cis-kyma-env-binding.response).credentials.kubeconfig
 }
 
 resource "local_sensitive_file" "ca-cert" {
   filename = "CA.crt"
-  content  = base64decode(yamldecode(jsondecode(data.http.kymaruntime_bindings.response_body).credentials.kubeconfig).clusters.0.cluster.certificate-authority-data)
+  content  = base64decode(yamldecode(jsondecode(terracurl_request.cis-kyma-env-binding.response).credentials.kubeconfig).clusters.0.cluster.certificate-authority-data)
 }
 
 ###
@@ -178,10 +209,19 @@ resource "terraform_data" "wait-for-kyma-readiness" {
        (
       KUBECONFIG=kubeconfig.yaml
       set -e -o pipefail ;\
+      ARCH=$(uname -m)
       if ! which kubectl; then
         echo "Installing kubectl..."
-        curl -LO https://dl.k8s.io/release/v1.32.0/bin/linux/amd64/kubectl
-        curl -LO "https://dl.k8s.io/v1.32.0/bin/linux/amd64/kubectl.sha256" &> /dev/null
+        if [ "$ARCH" = "x86_64" ]; then
+          ARCH="amd64"
+        elif [ "$ARCH" = "aarch64" ]; then
+          ARCH="arm64"
+        else
+          echo "Unsupported architecture: $ARCH"
+          exit 1
+        fi
+        curl -LO https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/$ARCH/kubectl
+        curl -LO "https://dl.k8s.io/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/$ARCH/kubectl.sha256" &> /dev/null
         echo "Validating kubectl ..."
         echo "$(cat kubectl.sha256)  kubectl" | sha256sum --check
         chmod +x kubectl
@@ -205,10 +245,10 @@ resource "terraform_data" "wait-for-kyma-readiness" {
 ###
 data "local_file" "cluster_id" {
   depends_on = [resource.terraform_data.wait-for-kyma-readiness]
-  filename = "cluster_id.txt"
+  filename   = "cluster_id.txt"
 }
 
 data "local_file" "domain" {
   depends_on = [resource.terraform_data.wait-for-kyma-readiness]
-  filename = "domain.txt"
+  filename   = "domain.txt"
 }

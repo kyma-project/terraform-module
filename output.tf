@@ -11,7 +11,7 @@ output "environment_instance_id" {
 output "kubeconfig" {
   description = "value of the kubeconfig for the Kyma environment."
   sensitive   = true
-  value       = yamldecode(jsondecode(data.http.kymaruntime_bindings.response_body).credentials.kubeconfig)
+  value       = yamldecode(jsondecode(terracurl_request.cis-kyma-env-binding.response).credentials.kubeconfig)
 }
 
 output "cluster_id" {
@@ -26,5 +26,5 @@ output "domain" {
 
 output "apiserver_url" {
   description = "The API server URL of the Kyma cluster."
-  value       = yamldecode(jsondecode(data.http.kymaruntime_bindings.response_body).credentials.kubeconfig).clusters.0.cluster.server
+  value       = yamldecode(jsondecode(terracurl_request.cis-kyma-env-binding.response).credentials.kubeconfig).clusters.0.cluster.server
 }
