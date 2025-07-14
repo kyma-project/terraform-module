@@ -1,0 +1,29 @@
+name: 📖 Documentation improvement
+description: Suggest an improvement in the documentation
+title: "[DOCS]"
+labels: [documentation]
+assignees:
+  - technical-writers
+body:
+  - type: textarea
+    id: area
+    attributes:
+      label: Describe the documentation issue
+      description: Provide a clear and concise description of the potential documentation improvement.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Explain the reason for the improvement
+      description: Explain why we should improve the document.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Additional context
+      description: |
+        Add any other context like links or references about the improvement here. Anything that will give us more context about the issue you are encountering!
+
+        Tip: You can attach images or files by clicking this area to highlight it and then dragging files in.
+    validations:
+      required: false
