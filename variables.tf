@@ -1,12 +1,6 @@
 # we're using uppercase variable names, since in some cases (e.g Azure DevOps) the system variables are forced to be uppercase
 # TF allows providing variable values as env variables of name name, case sensitive
 
-variable "BTP_BACKEND_URL" {
-  type        = string
-  description = "Backend URL for the BTP CLI server. Defaults to https://cli.btp.cloud.sap"
-  default     = "https://cli.btp.cloud.sap"
-}
-
 variable "BTP_USE_SUBACCOUNT_ID" {
   type        = string
   description = "ID of the subaccount to be used for the Kyma cluster"
@@ -106,16 +100,29 @@ variable "BTP_KYMA_MODULES" {
     name    = string
     channel = string
   }))
-  default     = []
-  description = "The list of Kyma modules to install. You can specify the name and channel for each module."
+  default = [
+    {
+      name    = "istio"
+      channel = "regular"
+    },
+    {
+      name    = "api-gateway"
+      channel = "regular"
+    },
+    {
+      name    = "btp-operator"
+      channel = "regular"
+    }
+  ]
+  description = "List of Kyma modules to install. You can specify the name and channel for each module."
   validation {
     condition = alltrue([
       for m in var.BTP_KYMA_MODULES :
       contains([
-        "application-connector", "cloud-manager", "eventing", "keda", "nats", "serverless", "telemetry", "transparent-proxy", "connectivity-proxy"
+        "istio", "api-gateway", "btp-operator", "application-connector", "cloud-manager", "eventing", "keda", "nats", "serverless", "telemetry", "transparent-proxy", "connectivity-proxy"
       ], m.name) && contains(["regular", "fast"], m.channel)
     ])
-    error_message = "Each module 'name' must be one of: application-connector, cloud-manager, eventing, keda, nats, serverless, telemetry, transparent-proxy, connectivity-proxy. Each 'channel' must be either 'regular' or 'fast'."
+    error_message = "Each module 'name' must be one of: istio, api-gateway, btp-operator, application-connector, cloud-manager, eventing, keda, nats, serverless, telemetry, transparent-proxy, connectivity-proxy. Each 'channel' must be either 'regular' or 'fast'."
   }
 }
 
@@ -145,4 +152,16 @@ variable "BTP_KYMA_SETUP_TIMEOUTS" {
     update = "30m"
     delete = "60m"
   }
+}
+
+variable "store_kubeconfig_locally" {
+  description = "If true, the kubeconfig will be stored in a local file named 'kubeconfig.yaml'."
+  type        = bool
+  default     = false
+}
+
+variable "store_cacert_locally" {
+  description = "If true, the ca certificate will be stored in a local file named 'CA.crt'."
+  type        = bool
+  default     = false
 }
