@@ -22,13 +22,12 @@ $ terraform destroy
 
 Note that this example may create resources which can cost money. Run `terraform destroy` when you don't need these resources.
 
-<!-- BEGIN_TF_DOCS -->
 ## Requirements
 
 | Name | Version |
 |------|---------|
 | <a name="requirement_btp"></a> [btp](#requirement\_btp) | ~> 1.14.0 |
-| <a name="requirement_http-full"></a> [http-full](#requirement\_http-full) | ~> 1.3.1 |
+| <a name="requirement_terracurl"></a> [terracurl](#requirement\_terracurl) | ~> 1.2.2 |
 
 ## Providers
 
@@ -40,7 +39,7 @@ Note that this example may create resources which can cost money. Run `terraform
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_kyma"></a> [kyma](#module\_kyma) | git::https://github.com/kyma-project/terraform-module.git | v0.4.1 |
+| <a name="module_kyma"></a> [kyma](#module\_kyma) | git::https://github.com/kyma-project/terraform-module.git | latest |
 
 ## Resources
 
@@ -64,7 +63,6 @@ Note that this example may create resources which can cost money. Run `terraform
 | <a name="input_BTP_CUSTOM_IAS_TENANT"></a> [BTP\_CUSTOM\_IAS\_TENANT](#input\_BTP\_CUSTOM\_IAS\_TENANT) | Custom IAS tenant | `string` | `"custom-tenant"` | no |
 | <a name="input_BTP_GLOBAL_ACCOUNT"></a> [BTP\_GLOBAL\_ACCOUNT](#input\_BTP\_GLOBAL\_ACCOUNT) | Subdomain of the SAP BTP global account | `string` | n/a | yes |
 | <a name="input_BTP_KYMA_CUSTOM_ADMINISTRATORS"></a> [BTP\_KYMA\_CUSTOM\_ADMINISTRATORS](#input\_BTP\_KYMA\_CUSTOM\_ADMINISTRATORS) | n/a | `list(string)` | `[]` | no |
-| <a name="input_BTP_KYMA_MODULES"></a> [BTP\_KYMA\_MODULES](#input\_BTP\_KYMA\_MODULES) | The list of kyma modules to install | <pre>list(object({<br/>    name    = string<br/>    channel = string<br/>  }))</pre> | <pre>[<br/>  {<br/>    "channel": "fast",<br/>    "name": "istio"<br/>  },<br/>  {<br/>    "channel": "fast",<br/>    "name": "api-gateway"<br/>  },<br/>  {<br/>    "channel": "fast",<br/>    "name": "btp-operator"<br/>  }<br/>]</pre> | no |
 | <a name="input_BTP_KYMA_PLAN"></a> [BTP\_KYMA\_PLAN](#input\_BTP\_KYMA\_PLAN) | Plan name | `string` | `"azure"` | no |
 | <a name="input_BTP_KYMA_REGION"></a> [BTP\_KYMA\_REGION](#input\_BTP\_KYMA\_REGION) | Kyma region | `string` | `"westeurope"` | no |
 | <a name="input_BTP_USE_SUBACCOUNT_ID"></a> [BTP\_USE\_SUBACCOUNT\_ID](#input\_BTP\_USE\_SUBACCOUNT\_ID) | ID of the subaccount | `string` | n/a | yes |
@@ -73,7 +71,6 @@ Note that this example may create resources which can cost money. Run `terraform
 
 | Name | Description |
 |------|-------------|
-| <a name="output_cluster_id"></a> [cluster\_id](#output\_cluster\_id) | ID of the Kyma cluster |
-| <a name="output_domain"></a> [domain](#output\_domain) | Domain of the Kyma cluster |
-| <a name="output_environment_instance_id"></a> [environment\_instance\_id](#output\_environment\_instance\_id) | ID of the Kyma environment instance |
-<!-- END_TF_DOCS -->
+| <a name="output_apiserver_url"></a> [apiserver\_url](#output\_apiserver\_url) | API server URL of the Kyma cluster |
+| <a name="output_environment_instance_id"></a> [environment\_instance\_id](#output\_environment\_instance\_id) | Id of the Kyma environment instance |
+| <a name="output_subaccount_id"></a> [subaccount\_id](#output\_subaccount\_id) | ID of the subaccount on SAP BTP |
