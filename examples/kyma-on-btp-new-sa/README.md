@@ -22,13 +22,12 @@ $ terraform destroy
 
 Note that this example may create resources which can cost money. Run `terraform destroy` when you don't need these resources.
 
-<!-- BEGIN_TF_DOCS -->
 ## Requirements
 
 | Name | Version |
 |------|---------|
 | <a name="requirement_btp"></a> [btp](#requirement\_btp) | ~> 1.14.0 |
-| <a name="requirement_http-full"></a> [http-full](#requirement\_http-full) | ~> 1.3.1 |
+| <a name="requirement_terracurl"></a> [terracurl](#requirement\_terracurl) | ~> 1.2.2 |
 
 ## Providers
 
@@ -38,7 +37,7 @@ No providers.
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_kyma"></a> [kyma](#module\_kyma) | git::https://github.com/kyma-project/terraform-module.git | v0.4.1 |
+| <a name="module_kyma"></a> [kyma](#module\_kyma) | git::https://github.com/kyma-project/terraform-module.git | latest |
 
 ## Resources
 
@@ -64,8 +63,5 @@ No resources.
 | Name | Description |
 |------|-------------|
 | <a name="output_apiserver_url"></a> [apiserver\_url](#output\_apiserver\_url) | API server URL of the Kyma cluster |
-| <a name="output_cluster_id"></a> [cluster\_id](#output\_cluster\_id) | ID of the Kyma cluster |
-| <a name="output_domain"></a> [domain](#output\_domain) | Domain of the Kyma cluster |
 | <a name="output_environment_instance_id"></a> [environment\_instance\_id](#output\_environment\_instance\_id) | Id of the Kyma environment instance |
 | <a name="output_subaccount_id"></a> [subaccount\_id](#output\_subaccount\_id) | ID of the subaccount on SAP BTP |
-<!-- END_TF_DOCS -->
