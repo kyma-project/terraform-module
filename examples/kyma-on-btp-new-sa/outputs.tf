@@ -5,17 +5,7 @@ output "subaccount_id" {
 
 output "environment_instance_id" {
   description = "Id of the Kyma environment instance"
-  value       = module.kyma.service_instance_id
-}
-
-output "cluster_id" {
-  description = "ID of the Kyma cluster"
-  value       = module.kyma.cluster_id
-}
-
-output "domain" {
-  description = "Domain of the Kyma cluster"
-  value       = module.kyma.domain
+  value       = module.kyma.environment_instance_id
 }
 
 output "apiserver_url" {

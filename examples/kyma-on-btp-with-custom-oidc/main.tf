@@ -15,7 +15,9 @@ data "btp_subaccount" "target_subaccount" {
   id = local.subaccount_id
 }
 
-# Setup of the Custom IDP in the subaccountcustom idp setup
+###
+# Setup of the Custom IDP in the subaccount
+###
 resource "btp_subaccount_entitlement" "identity" {
   subaccount_id = local.subaccount_id
   service_name  = "identity"
@@ -29,7 +31,6 @@ data "btp_subaccount_service_plan" "identity_application" {
   offering_name = "identity"
   name          = "application"
 }
-
 
 resource "btp_subaccount_trust_configuration" "custom_idp" {
   subaccount_id     = var.BTP_USE_SUBACCOUNT_ID
@@ -100,18 +101,20 @@ resource "btp_subaccount_service_binding" "identity_application_binding" {
   })
 }
 
+###
 # Setup of Kyma cluster using the custom OIDC provider
+###
+
 module "kyma" {
-  depends_on = [
-    btp_subaccount_service_binding.identity_application_binding
-  ]
+  depends_on = [btp_subaccount_service_binding.identity_application_binding]
 
-  source = "git::https://github.com/kyma-project/terraform-module.git?ref=v0.4.1"
+  # Replace with version you want to use - avoid using latest as version constraint
+  source = "git::https://github.com/kyma-project/terraform-module.git?ref=latest"
 
-  BTP_KYMA_PLAN                  = var.BTP_KYMA_PLAN
   BTP_USE_SUBACCOUNT_ID          = var.BTP_USE_SUBACCOUNT_ID
+  BTP_KYMA_REGION                = var.BTP_KYMA_REGION
+  BTP_KYMA_PLAN                  = var.BTP_KYMA_PLAN
   BTP_KYMA_CUSTOM_OIDC           = local.oidc_config
   BTP_KYMA_CUSTOM_ADMINISTRATORS = var.BTP_KYMA_CUSTOM_ADMINISTRATORS
-  BTP_KYMA_REGION                = var.BTP_KYMA_REGION
   BTP_KYMA_MODULES               = var.BTP_KYMA_MODULES
 }

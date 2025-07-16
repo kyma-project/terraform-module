@@ -4,12 +4,13 @@ terraform {
       source  = "SAP/btp"
       version = "~> 1.14.0"
     }
-    http-full = {
-      source  = "salrashid123/http-full"
-      version = "~> 1.3.1"
+    terracurl = {
+      source  = "devops-rob/terracurl"
+      version = "~> 1.2.2"
     }
   }
 }
+
 
 provider "btp" {
   globalaccount  = var.BTP_GLOBAL_ACCOUNT
@@ -19,4 +20,4 @@ provider "btp" {
   password       = var.BTP_BOT_PASSWORD
 }
 
-provider "http-full" {}
+provider "terracurl" {}

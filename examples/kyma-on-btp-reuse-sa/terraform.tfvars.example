@@ -1,17 +1,13 @@
 # Rename this file as `terraform.tfvars` and provide values for the variables
 
-BTP_USE_SUBACCOUNT_ID = ""
+BTP_GLOBAL_ACCOUNT    = ""
 BTP_BOT_USER          = ""
 BTP_BOT_PASSWORD      = ""
-BTP_GLOBAL_ACCOUNT    = ""
-
-# optional. will default to `https://cli.btp.cloud.sap`. For Canary landscape use `https://cpcli.cf.sap.hana.ondemand.com`
-BTP_BACKEND_URL = ""
-
-# Mandatory
 BTP_CUSTOM_IAS_TENANT = ""
 
-# Optional. defaults to `azure`; One of: `azure`, `sap-converged-cloud`, `aws`, `gcp`
+BTP_USE_SUBACCOUNT_ID = ""
+
+# Optional. defaults to `azure`; One of: `azure`, `azure-lite`, `aws`, `gcp`
 BTP_KYMA_PLAN = ""
 # Must match options for given plan; i.e `westeurope` is a valid kyma region for kyma plan `azure`
 BTP_KYMA_REGION = ""
