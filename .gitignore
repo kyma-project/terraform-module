@@ -13,3 +13,5 @@ examples/*/kubectl
 examples/kyma-on-btp-new-sa/CA.crt
 .env
 playground/**
+tests/btp-e2e-test/terraform.tfstate.backup
+tests/btp-e2e-test/terraform.tfvars

@@ -16,7 +16,7 @@ jobs:
         with:
           terraform_wrapper: false
       - name: Create kyma runtime on btp
-        working-directory: examples/kyma-on-btp-new-sa
+        working-directory: tests/btp-e2e-test
         run: |
           terraform init
           terraform apply -auto-approve
