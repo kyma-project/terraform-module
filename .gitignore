@@ -11,3 +11,5 @@ examples/*/cluster_id.txt
 examples/*/domain.txt
 examples/*/kubectl
 examples/kyma-on-btp-new-sa/CA.crt
+.env
+playground/**

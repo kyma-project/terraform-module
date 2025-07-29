@@ -1,8 +1,21 @@
-# "kyma.tf"
+data "btp_subaccount" "reuse_subaccount" {
+  count = var.BTP_USE_SUBACCOUNT_ID != null ? 1 : 0
+  id    = var.BTP_USE_SUBACCOUNT_ID
+}
 
 locals {
-  subaccount_name = var.BTP_USE_SUBACCOUNT_ID != null && var.BTP_NEW_SUBACCOUNT_NAME ==null ? one(data.btp_subaccount.reuse_subaccount).name : one(btp_subaccount.subaccount).name
-  subaccount_id   = var.BTP_USE_SUBACCOUNT_ID != null && var.BTP_NEW_SUBACCOUNT_NAME ==null ? one(data.btp_subaccount.reuse_subaccount).id : one(btp_subaccount.subaccount).id
+  subaccount_name = var.BTP_USE_SUBACCOUNT_ID != null ? one(data.btp_subaccount.reuse_subaccount).name : one(btp_subaccount.subaccount).name
+  subaccount_id   = var.BTP_USE_SUBACCOUNT_ID != null ? one(data.btp_subaccount.reuse_subaccount).id : one(btp_subaccount.subaccount).id
+}
+
+###
+# Setup the subaccount including entitlements for Kyma
+###
+resource "btp_subaccount" "subaccount" {
+  count     = var.BTP_USE_SUBACCOUNT_ID == null ? 1 : 0
+  name      = var.BTP_NEW_SUBACCOUNT_NAME
+  region    = var.BTP_NEW_SUBACCOUNT_REGION
+  subdomain = var.BTP_NEW_SUBACCOUNT_NAME
 }
 
 resource "btp_subaccount_entitlement" "kyma" {
@@ -12,117 +25,15 @@ resource "btp_subaccount_entitlement" "kyma" {
   amount        = 1
 }
 
-resource "btp_subaccount_entitlement" "sm-operator-access" {
+resource "btp_subaccount_entitlement" "sm_operator_access" {
   subaccount_id = local.subaccount_id
-  service_name = "service-manager"
-  plan_name = "service-operator-access"
+  service_name  = "service-manager"
+  plan_name     = "service-operator-access"
 }
 
-resource "btp_subaccount_environment_instance" "kyma" {
-  depends_on = [
-    resource.btp_subaccount_entitlement.sm-operator-access
-  ]
-  subaccount_id    = local.subaccount_id
-  name             = "${local.subaccount_name}-kyma"
-  environment_type = "kyma"
-  service_name     = btp_subaccount_entitlement.kyma.service_name
-  plan_name        = btp_subaccount_entitlement.kyma.plan_name
-  parameters = jsonencode({
-    modules = {
-      list = var.BTP_KYMA_MODULES
-    }
-    oidc = var.BTP_KYMA_CUSTOM_OIDC
-    name   = "${local.subaccount_name}-kyma"
-    region = var.BTP_KYMA_REGION
-    administrators = var.BTP_KYMA_CUSTOM_ADMINISTRATORS
-    autoScalerMin = var.BTP_KYMA_AUTOSCALER_MIN
-    autoScalerMax = var.BTP_KYMA_AUTOSCALER_MAX
-  })
-  timeouts = {
-    create = "60m"
-    update = "30m"
-    delete = "60m"
-  }
-}
-
-
-resource "local_sensitive_file" "kubeconfig-yaml" {
-  filename = "kubeconfig.yaml"
-  content  = jsondecode(data.http.kymaruntime_bindings.response_body).credentials.kubeconfig
-}
-
-resource "local_sensitive_file" "ca-cert" {
-  filename = "CA.crt"
-  content  = base64decode(yamldecode(jsondecode(data.http.kymaruntime_bindings.response_body).credentials.kubeconfig).clusters.0.cluster.certificate-authority-data)
-}
-
-# wait for kyma readiness 
-resource "terraform_data" "wait-for-kyma-readiness" {
-  depends_on = [
-    resource.local_sensitive_file.kubeconfig-yaml
-  ]
-  provisioner "local-exec" {
-    interpreter = ["/bin/bash", "-c"]
-     command = <<EOF
-       (
-      KUBECONFIG=kubeconfig.yaml
-      set -e -o pipefail ;\
-      if ! which kubectl; then
-        echo "Installing kubectl..."
-        curl -LO https://dl.k8s.io/release/v1.32.0/bin/linux/amd64/kubectl
-        curl -LO "https://dl.k8s.io/v1.32.0/bin/linux/amd64/kubectl.sha256" &> /dev/null
-        echo "Validating kubectl ..."
-        echo "$(cat kubectl.sha256)  kubectl" | sha256sum --check
-        chmod +x kubectl
-      fi
-      while ! kubectl get crd kymas.operator.kyma-project.io --kubeconfig $KUBECONFIG; do echo "Waiting for Kyma CRD..."; sleep 1; done
-      kubectl wait --for condition=established crd/kymas.operator.kyma-project.io --kubeconfig $KUBECONFIG
-      while ! kubectl get kyma default -n kyma-system --kubeconfig $KUBECONFIG; do echo "Waiting for default kyma CR..."; sleep 1; done
-      kubectl wait --for='jsonpath={.status.state}=Ready' kymas.operator.kyma-project.io/default -n kyma-system --kubeconfig $KUBECONFIG --timeout=480s
-      while ! kubectl get secret sap-btp-manager -n kyma-system --kubeconfig $KUBECONFIG; do echo "Waiting for sap-btp-manager..."; sleep 1; done
-      kubectl get secret sap-btp-manager -n kyma-system -ojsonpath={.data.cluster_id} --kubeconfig $KUBECONFIG > cluster_id.txt
-      while ! kubectl get cm shoot-info -n kube-system --kubeconfig $KUBECONFIG; do echo "Waiting for shoot-info cm..."; sleep 1; done
-      kubectl get cm shoot-info -n kube-system -ojsonpath={.data.domain} --kubeconfig $KUBECONFIG  > domain.txt
-       )
-     EOF
-  } 
-}
-
-data "local_file" "cluster_id" {
-  depends_on = [
-    resource.terraform_data.wait-for-kyma-readiness
-  ]
-  filename = "cluster_id.txt"
-}
-
-data "local_file" "domain" {
-  depends_on = [
-    resource.terraform_data.wait-for-kyma-readiness
-  ]
-  filename = "domain.txt"
-}
-
-locals {
-  cisCredentials = jsondecode(btp_subaccount_service_binding.cis-local-binding.credentials)
-  instance_id = btp_subaccount_environment_instance.kyma.id
-  cisBasicAuth = base64encode("${local.cisCredentials.uaa.clientid}:${local.cisCredentials.uaa.clientsecret}")
-}
-
-
-#"subaccount.tf"
-data "btp_subaccount" "reuse_subaccount" {
-  count = var.BTP_USE_SUBACCOUNT_ID != null && var.BTP_NEW_SUBACCOUNT_NAME == null ? 1 : 0
-  id = var.BTP_USE_SUBACCOUNT_ID
-}
-
-resource "btp_subaccount" "subaccount" {
-  count = var.BTP_NEW_SUBACCOUNT_NAME != null && var.BTP_USE_SUBACCOUNT_ID == null ? 1 : 0
-  name      = var.BTP_NEW_SUBACCOUNT_NAME
-  region    = var.BTP_NEW_SUBACCOUNT_REGION
-  subdomain = var.BTP_NEW_SUBACCOUNT_NAME
-}
-
-# cis
+###
+# Setup CIS
+###
 resource "btp_subaccount_entitlement" "cis" {
   subaccount_id = local.subaccount_id
   service_name  = "cis"
@@ -130,34 +41,71 @@ resource "btp_subaccount_entitlement" "cis" {
 }
 
 data "btp_subaccount_service_plan" "cis" {
-  depends_on     = [btp_subaccount_entitlement.cis]
+  depends_on = [btp_subaccount_entitlement.cis]
+
   subaccount_id = local.subaccount_id
   offering_name = "cis"
   name          = "local"
 }
 
-resource "btp_subaccount_service_instance" "cis-local" {
-  depends_on     = [btp_subaccount_entitlement.cis]
+resource "btp_subaccount_service_instance" "cis_local" {
+  depends_on = [btp_subaccount_entitlement.cis]
+
   subaccount_id  = local.subaccount_id
   name           = "cis-local"
   serviceplan_id = data.btp_subaccount_service_plan.cis.id
   parameters = jsonencode({
-      "grantType": "clientCredentials"
+    "grantType" : "clientCredentials"
   })
 }
 
-resource "btp_subaccount_service_binding" "cis-local-binding" {
-  depends_on          = [btp_subaccount_service_instance.cis-local]
+resource "btp_subaccount_service_binding" "cis_local_binding" {
+  depends_on = [btp_subaccount_service_instance.cis_local]
+
   subaccount_id       = local.subaccount_id
   name                = "cis-local-binding"
-  service_instance_id = btp_subaccount_service_instance.cis-local.id
+  service_instance_id = btp_subaccount_service_instance.cis_local.id
 }
 
-# fetch token for hana admin API using client-credential service binding
-data "http" "cis-api-token" {
-  depends_on = [
-    btp_subaccount_service_binding.cis-local-binding
-  ]
+locals {
+  cisCredentials = jsondecode(btp_subaccount_service_binding.cis_local_binding.credentials)
+  cisBasicAuth   = base64encode("${local.cisCredentials.uaa.clientid}:${local.cisCredentials.uaa.clientsecret}")
+}
+
+###
+# Setup the Kyma environment
+###
+resource "btp_subaccount_environment_instance" "kyma" {
+  depends_on = [resource.btp_subaccount_entitlement.sm_operator_access]
+
+  subaccount_id    = local.subaccount_id
+  name             = "${local.subaccount_name}-kyma"
+  environment_type = "kyma"
+  service_name     = btp_subaccount_entitlement.kyma.service_name
+  plan_name        = btp_subaccount_entitlement.kyma.plan_name
+  parameters = jsonencode({
+    modules        = { list = var.BTP_KYMA_MODULES }
+    oidc           = var.BTP_KYMA_CUSTOM_OIDC
+    name           = "${local.subaccount_name}-kyma"
+    region         = var.BTP_KYMA_REGION
+    administrators = var.BTP_KYMA_CUSTOM_ADMINISTRATORS
+    autoScalerMin  = var.BTP_KYMA_AUTOSCALER_MIN
+    autoScalerMax  = var.BTP_KYMA_AUTOSCALER_MAX
+  })
+  timeouts = {
+    create = var.BTP_KYMA_SETUP_TIMEOUTS.create
+    update = var.BTP_KYMA_SETUP_TIMEOUTS.update
+    delete = var.BTP_KYMA_SETUP_TIMEOUTS.delete
+  }
+}
+
+###
+# Create Kyma environment binding via CIS provisioning API
+###
+# Fetch token from CIS API using client-credential service binding
+data "http" "cis_api_token" {
+  depends_on = [btp_subaccount_service_binding.cis_local_binding]
+
   url    = "${local.cisCredentials.uaa.url}/oauth/token?grant_type=client_credentials"
   method = "POST"
   request_headers = {
@@ -165,26 +113,55 @@ data "http" "cis-api-token" {
   }
 }
 
-# create kyma binding via provisioning API
-data "http" "kymaruntime_bindings" {
-  depends_on = [
-    data.http.cis-api-token,
-    local.instance_id
-  ]
+resource "terracurl_request" "cis_kyma_env_binding" {
+  depends_on = [data.http.cis_api_token, btp_subaccount_environment_instance.kyma]
 
-  provider = http-full
+  name         = "cis_kyma_env_binding"
+  url          = "${local.cisCredentials.endpoints.provisioning_service_url}/provisioning/v1/environments/${btp_subaccount_environment_instance.kyma.id}/bindings"
+  method       = "PUT"
+  request_body = jsonencode({ "parameters" = { "expiration_seconds" = 7200 } })
 
-  url = "${local.cisCredentials.endpoints.provisioning_service_url}/provisioning/v1/environments/${local.instance_id}/bindings"
-  method = "PUT"
-  request_headers = {
-    Authorization = "Bearer ${jsondecode(data.http.cis-api-token.response_body).access_token}"
+  headers = {
+    Authorization = "Bearer ${jsondecode(data.http.cis_api_token.response_body).access_token}"
     Accept        = "application/json"
     content-type  = "application/json"
-  } 
+  }
 
-  request_body = jsonencode({
-    "parameters": {
-      "expiration_seconds": 7200,
-    } 
-  })  
+  response_codes = [202]
+
+  # Skip a HTTP call when destroying the resource, since the binding will be deleted when the Kyma cluster is deprovisioned
+  destroy_skip = true
+
+  lifecycle {
+    ignore_changes = [
+      # Ignore changes from the bearer token. They should not trigger a new binding.
+      headers, destroy_headers
+    ]
+  }
+}
+
+###
+# Store the kubeconfig and CA certificate as ressource
+###
+resource "terraform_data" "kubeconfig" {
+  input = jsondecode(terracurl_request.cis_kyma_env_binding.response).credentials.kubeconfig
+}
+
+resource "terraform_data" "ca_cert" {
+  input = base64decode(yamldecode(jsondecode(terracurl_request.cis_kyma_env_binding.response).credentials.kubeconfig).clusters.0.cluster.certificate-authority-data)
+}
+
+###
+# Store the kubeconfig and CA certificate in local files after CIS binding is available
+###
+resource "local_sensitive_file" "kubeconfig_yaml" {
+  count    = var.store_kubeconfig_locally ? 1 : 0
+  filename = "kubeconfig.yaml"
+  content  = jsondecode(terracurl_request.cis_kyma_env_binding.response).credentials.kubeconfig
+}
+
+resource "local_sensitive_file" "ca_cert" {
+  count    = var.store_cacert_locally ? 1 : 0
+  filename = "CA.crt"
+  content  = base64decode(yamldecode(jsondecode(terracurl_request.cis_kyma_env_binding.response).credentials.kubeconfig).clusters.0.cluster.certificate-authority-data)
 }
