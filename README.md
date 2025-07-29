@@ -100,7 +100,7 @@ No modules.
 |   +-- terraform.tfvars
 ```
 
-2. In the `terraform.tfvars` file, provide values that are necessary for the `Kyma` module (Kyma module's [input parameters](#Inputs)) and the [Terrform provider for SAP BTP](https://registry.terraform.io/providers/SAP/btp/latest) that is used in the module.
+2. In the `terraform.tfvars` file, provide values that are necessary for the `Kyma` module (Kyma module's [input parameters](#inputs)) and the [Terrform provider for SAP BTP](https://registry.terraform.io/providers/SAP/btp/latest) that is used in the module.
 
 For example:
 
@@ -115,7 +115,7 @@ BTP_KYMA_PLAN             = "azure"
 BTP_KYMA_REGION           = "westeurope"
 ```
 
-3. In the `main.tf`, ensure the [required providers](#Providers) and include the Kyma module as a child module.
+3. In the `main.tf`, ensure the [required providers](#providers) and include the Kyma module as a child module.
 
 ```terraform
 terraform {
