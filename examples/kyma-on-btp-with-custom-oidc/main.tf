@@ -109,7 +109,7 @@ module "kyma" {
   depends_on = [btp_subaccount_service_binding.identity_application_binding]
 
   # Replace with version you want to use - avoid using latest as version constraint
-  source = "git::https://github.com/kyma-project/terraform-module.git?ref=latest"
+  source = "git::https://github.com/kyma-project/terraform-btp-kyma-environment.git?ref=latest"
 
   BTP_USE_SUBACCOUNT_ID          = var.BTP_USE_SUBACCOUNT_ID
   BTP_KYMA_REGION                = var.BTP_KYMA_REGION
