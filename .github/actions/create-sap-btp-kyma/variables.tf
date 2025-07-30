@@ -49,7 +49,7 @@ variable "BTP_KYMA_MODULES_STRINGIFIED" {
 }
 
 variable "BTP_KYMA_AUTOSCALER_MIN" {
-  type = number
+  type    = number
   default = 3
 }
 
