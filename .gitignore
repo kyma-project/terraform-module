@@ -15,3 +15,8 @@ examples/kyma-on-btp-new-sa/CA.crt
 playground/**
 tests/btp-e2e-test/terraform.tfstate.backup
 tests/btp-e2e-test/terraform.tfvars
+examples/kyma-on-btp-new-sa/plan.out
+.github/actions/create-sap-btp-kyma/.terraform.tfstate.lock.info
+.github/actions/create-sap-btp-kyma/terraform.tfvars
+.github/actions/create-sap-btp-kyma/plan.out
+.github/actions/create-sap-btp-kyma/terraform.tfstate.backup
