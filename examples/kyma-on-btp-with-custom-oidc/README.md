@@ -39,7 +39,7 @@ Note that this example may create resources which can cost money. Run `terraform
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_kyma"></a> [kyma](#module\_kyma) | git::https://github.com/kyma-project/terraform-module.git | latest |
+| <a name="module_kyma"></a> [kyma](#module\_kyma) | git::https://github.com/kyma-project/terraform-btp-kyma-environment.git | latest |
 
 ## Resources
 

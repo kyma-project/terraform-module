@@ -1,4 +1,4 @@
-name: pull-e2e-test
+name: push-e2e-test
 on:
   push:
     branches: ["main", "release-*"]
