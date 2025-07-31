@@ -2,7 +2,7 @@
 
 ## Status
 
-[![REUSE status](https://api.reuse.software/badge/github.com/kyma-project/terraform-module)](https://api.reuse.software/info/github.com/kyma-project/terraform-module)
+[![REUSE status](https://api.reuse.software/badge/github.com/kyma-project/terraform-btp-kyma-environment)](https://api.reuse.software/info/github.com/kyma-project/terraform-btp-kyma-environment)
 
 ## Overview
 
@@ -192,4 +192,4 @@ Validate that the planned changes are correct, and then confirm the `destroy` op
 
 For a local usage of the module, we added the parameters `store_kubeconfig_locally` and `store_ca_cert_locally` to the module. If you set these parameters to `true`, the module will create a local file with the kubeconfig and CA certificate of the Kyma cluster. This adds some convenience for local development and testing.
 
-As a next step you might want to extract the Kyma Cluster ID as well as the Kyma Cluster domain. This operation cannot be directly done inside of the module without having several drawbacks when it comes to the Terraform lifecycle. To enable the retirval of these values we added a Bash and a Powershell script to the GitHub repository in the folder [scripts](https://github.com/kyma-project/terraform-module/tree/main/scripts) that you can use to extract these values from the Kyma cluster. The scripts will read the kubeconfig file from the environment variable `KUBECONFIG` and extract the cluster ID and domain and write them to local files called `domain.txt` and `cluster_id.txt`.
+As a next step you might want to extract the Kyma Cluster ID as well as the Kyma Cluster domain. This operation cannot be directly done inside of the module without having several drawbacks when it comes to the Terraform lifecycle. To enable the retirval of these values we added a Bash and a Powershell script to the GitHub repository in the folder [scripts](https://github.com/kyma-project/terraform-btp-kyma-environment/tree/main/scripts) that you can use to extract these values from the Kyma cluster. The scripts will read the kubeconfig file from the environment variable `KUBECONFIG` and extract the cluster ID and domain and write them to local files called `domain.txt` and `cluster_id.txt`.
