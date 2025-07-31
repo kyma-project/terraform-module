@@ -22,7 +22,7 @@ provider "btp" {
 provider "terracurl" {}
 
 module "kyma" {
-  source = "git::https://github.com/kyma-project/terraform-btp-kyma-environment.git?ref=1.0.0"
+  source = "git::https://github.com/kyma-project/terraform-btp-kyma-environment.git?ref=main"
 
   BTP_NEW_SUBACCOUNT_NAME        = var.BTP_NEW_SUBACCOUNT_NAME
   BTP_NEW_SUBACCOUNT_REGION      = var.BTP_NEW_SUBACCOUNT_REGION
