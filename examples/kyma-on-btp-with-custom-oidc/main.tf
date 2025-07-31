@@ -8,6 +8,10 @@ locals {
     usernamePrefix = "-"
     clientID       = jsondecode(btp_subaccount_service_binding.identity_application_binding.credentials).clientid
     issuerURL      = "https://${var.BTP_CUSTOM_IAS_TENANT}.${var.BTP_CUSTOM_IAS_DOMAIN}"
+    requiredClaims = [
+      "sub",
+      "email",
+    ]
   }
 }
 
@@ -116,5 +120,4 @@ module "kyma" {
   BTP_KYMA_PLAN                  = var.BTP_KYMA_PLAN
   BTP_KYMA_CUSTOM_OIDC           = local.oidc_config
   BTP_KYMA_CUSTOM_ADMINISTRATORS = var.BTP_KYMA_CUSTOM_ADMINISTRATORS
-  BTP_KYMA_MODULES               = var.BTP_KYMA_MODULES
 }
