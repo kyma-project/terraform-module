@@ -1,6 +1,6 @@
 module "kyma" {
   # Replace with version you want to use - avoid using main as version constraint
-  source = "git::https://github.com/kyma-project/terraform-btp-kyma-environment.git?ref=main"
+  source = "git::https://github.com/kyma-project/terraform-btp-kyma-environment.git?ref=1.0.0"
 
   BTP_USE_SUBACCOUNT_ID          = var.BTP_USE_SUBACCOUNT_ID
   BTP_KYMA_PLAN                  = var.BTP_KYMA_PLAN
