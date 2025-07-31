@@ -2,23 +2,15 @@ terraform {
   required_providers {
     btp = {
       source  = "SAP/btp"
-      version = ">= 1.7.0"
+      version = "~> 1.14.0"
     }
-    http = {
-      source = "hashicorp/http"
-    }
-    http-full = {
-      source = "salrashid123/http-full"
-    }
-    kubernetes = {
-      source  = "hashicorp/kubernetes"
-      version = "~> 2.32.0"
+    terracurl = {
+      source  = "devops-rob/terracurl"
+      version = "~> 1.2.2"
     }
   }
 }
 
-provider "http" {}
-provider "http-full" {}
 provider "btp" {
   globalaccount  = var.BTP_GLOBAL_ACCOUNT
   cli_server_url = var.BTP_BACKEND_URL
@@ -27,21 +19,22 @@ provider "btp" {
   password       = var.BTP_BOT_PASSWORD
 }
 
+provider "terracurl" {}
+
 module "kyma" {
-  source                         = "git::https://github.com/kyma-project/terraform-btp-kyma-environment?ref=v0.4.1"
-  BTP_KYMA_PLAN                  = var.BTP_KYMA_PLAN
+  source = "git::https://github.com/kyma-project/terraform-btp-kyma-environment.git?ref=1.0.0"
+
   BTP_NEW_SUBACCOUNT_NAME        = var.BTP_NEW_SUBACCOUNT_NAME
-  BTP_KYMA_REGION                = var.BTP_KYMA_REGION
   BTP_NEW_SUBACCOUNT_REGION      = var.BTP_NEW_SUBACCOUNT_REGION
+  BTP_KYMA_PLAN                  = var.BTP_KYMA_PLAN
+  BTP_KYMA_REGION                = var.BTP_KYMA_REGION
   BTP_KYMA_MODULES               = jsondecode(var.BTP_KYMA_MODULES_STRINGIFIED)
   BTP_KYMA_AUTOSCALER_MIN        = var.BTP_KYMA_AUTOSCALER_MIN
   BTP_KYMA_CUSTOM_ADMINISTRATORS = jsondecode(var.BTP_KYMA_CUSTOM_ADMINISTRATORS)
+  store_kubeconfig_locally       = true
 }
 
 output "subaccount_id" {
   value = module.kyma.subaccount_id
 }
 
-output "domain" {
-  value = module.kyma.domain
-}
